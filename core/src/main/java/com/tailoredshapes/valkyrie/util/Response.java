@@ -1,15 +1,19 @@
 package com.tailoredshapes.valkyrie.util;
 
 import com.tailoredshapes.stringmap.StringMap;
+import com.tailoredshapes.underbar.Strings;
 import com.tailoredshapes.underbar.UnderBar;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.tailoredshapes.stringmap.StringMap.smap;
 import static com.tailoredshapes.underbar.Die.rethrow;
 import static com.tailoredshapes.underbar.UnderBar.*;
+import static com.tailoredshapes.valkyrie.util.IO.lastModifiedDate;
+import static com.tailoredshapes.valkyrie.util.Time.formatDate;
 
 /**
  * Created by tmarsh on 10/25/16.
@@ -115,4 +119,64 @@ public class Response {
         return optionalSupplier.isPresent() ? optionalSupplier.get().get() : optional();
     }
 
+    public static File safelyFindFile(String path, StringMap opts){
+        String root = opts.string("root");
+        if(Strings.hasContent(root)){
+            if((isSafePath(root, path)) || (opts.bool("allowSymlinks?") && !isDirectoryTraversal(path))){
+                return new File(root, path);
+            } else {
+                return null;
+            }
+        }else {
+            return new File(path);
+        }
+    }
+
+    public static File findFile(String path, StringMap opts){
+        return maybeNull(safelyFindFile(path, opts), f -> {
+            if(f.isDirectory()){
+                if(opts.bool("indexFiles?", true)){
+                    return optionally_(findIndexFile(f), (o)->o, ()->null);
+                }
+            } else if(f.exists()){
+                return f;
+            }
+            return null;
+        }, () -> null);
+    }
+
+    public static StringMap fileData(File file){
+        return smap(
+                "content", file,
+                "content-length", file.length(),
+                "last-modified", lastModifiedDate(file));
+    }
+
+    public static StringMap contentLength(StringMap resp, int len){
+        return header(resp, "Content-Length", len);
+    }
+
+    public static StringMap lastModified(StringMap resp, Date lastModified){
+        return header(resp, "Last-Modified", formatDate(lastModified));
+    }
+
+    public static Optional<StringMap> fileResponse(String filePath){
+        return fileResponse(filePath, smap());
+    }
+
+    public static Optional<StringMap> fileResponse(String filePath, StringMap opts){
+        File file = findFile(filePath, opts);
+        if(file != null) {
+            StringMap data = fileData(file);
+            return optional(lastModified(
+                    contentLength(
+                            response(
+                                    data.string("content")),
+                            data.integer("content-length")),
+                    data.date("last-modified").toDate()));
+        }
+        return optional();
+    }
+    
 }
+
