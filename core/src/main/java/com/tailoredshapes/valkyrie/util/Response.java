@@ -1,8 +1,8 @@
 package com.tailoredshapes.valkyrie.util;
 
-import com.tailoredshapes.stringmap.StringMap;
-import com.tailoredshapes.underbar.Strings;
+import com.tailoredshapes.stash.Stash;
 import com.tailoredshapes.underbar.UnderBar;
+import com.tailoredshapes.underbar.UnderString;
 
 import java.io.File;
 import java.net.JarURLConnection;
@@ -16,7 +16,7 @@ import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 
-import static com.tailoredshapes.stringmap.StringMap.smap;
+import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.rethrow;
 import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.valkyrie.util.IO.lastModifiedDate;
@@ -43,52 +43,52 @@ public class Response {
         }
     }
 
-    public static StringMap redirect(String url) {
+    public static Stash redirect(String url) {
         return redirect(url, RedirectStatusCode.FOUND);
     }
 
-    public static StringMap redirect(String url, RedirectStatusCode status) {
-        return smap(
+    public static Stash redirect(String url, RedirectStatusCode status) {
+        return Stash.stash(
                 "status", status.code,
-                "headers", smap("Location", url),
+                "headers", Stash.stash("Location", url),
                 "body", ""
         );
     }
 
-    public static StringMap created(String url, String body) {
-        return smap(
+    public static Stash created(String url, String body) {
+        return Stash.stash(
                 "status", 201,
-                "headers", smap("Location", url),
+                "headers", Stash.stash("Location", url),
                 "body", body
         );
     }
 
-    public static StringMap created(String url) {
+    public static Stash created(String url) {
         return created(url, null);
     }
 
-    public static StringMap notFound(String body) {
-        return smap(
+    public static Stash notFound(String body) {
+        return Stash.stash(
                 "status", 404,
-                "headers", smap(),
+                "headers", Stash.stash(),
                 "body", body
         );
     }
 
-    public static StringMap response(String body) {
-        return smap(
+    public static Stash response(String body) {
+        return Stash.stash(
                 "status", 200,
-                "headers", smap(),
+                "headers", Stash.stash(),
                 "body", body
         );
     }
 
-    public static StringMap status(StringMap response, RedirectStatusCode status) {
-        return response.put("status", status);
+    public static Stash status(Stash response, RedirectStatusCode status) {
+        return response.update("status", status);
     }
 
-    public static <T> StringMap header(StringMap response, String key, T value) {
-        return response.smap("headers").put(key, value);
+    public static <T> Stash header(Stash response, String key, T value) {
+        return response.get("headers", Stash.class).update(key, value);
     }
 
     private static boolean isSafePath(String root, String path) {
@@ -109,7 +109,7 @@ public class Response {
     }
 
     public static Optional<File> findFileStartingWith(File dir, String prefix) {
-        return optionally_(Optional.ofNullable(dir.listFiles()), (files) ->
+        return optionally(Optional.ofNullable(dir.listFiles()), (files) ->
                         stream(list(files))
                                 .filter(
                                         (file) ->
@@ -129,9 +129,9 @@ public class Response {
         return optionalSupplier.isPresent() ? optionalSupplier.get().get() : optional();
     }
 
-    public static File safelyFindFile(String path, StringMap opts) {
-        String root = opts.string("root");
-        if (Strings.hasContent(root)) {
+    public static File safelyFindFile(String path, Stash opts) {
+        String root = opts.get("root");
+        if (UnderString.hasContent(root)) {
             if ((isSafePath(root, path)) || (opts.bool("allowSymlinks?") && !isDirectoryTraversal(path))) {
                 return new File(root, path);
             } else {
@@ -142,11 +142,11 @@ public class Response {
         }
     }
 
-    public static File findFile(String path, StringMap opts) {
+    public static File findFile(String path, Stash opts) {
         return maybeNull(safelyFindFile(path, opts), f -> {
             if (f.isDirectory()) {
-                if (opts.bool("indexFiles?", true)) {
-                    return optionally_(findIndexFile(f), (o) -> o, () -> null);
+                if (opts.get("indexFiles?", true)) {
+                    return optionally(findIndexFile(f), (o) -> o, () -> null);
                 }
             } else if (f.exists()) {
                 return f;
@@ -155,68 +155,71 @@ public class Response {
         }, () -> null);
     }
 
-    public static StringMap fileData(File file) {
-        return smap(
+    public static Stash fileData(File file) {
+        return Stash.stash(
                 "content", file,
                 "content-length", file.length(),
                 "last-modified", lastModifiedDate(file));
     }
 
-    public static StringMap contentLength(StringMap resp, int len) {
+    public static Stash contentLength(Stash resp, int len) {
         return header(resp, "Content-Length", len);
     }
 
-    public static StringMap lastModified(StringMap resp, Date lastModified) {
+    public static Stash lastModified(Stash resp, Date lastModified) {
         return header(resp, "Last-Modified", formatDate(lastModified));
     }
 
-    public static Optional<StringMap> fileResponse(String filePath) {
-        return fileResponse(filePath, smap());
+    public static Optional<Stash> fileResponse(String filePath) {
+        return fileResponse(filePath, Stash.stash());
     }
 
-    public static Optional<StringMap> fileResponse(String filePath, StringMap opts) {
+    public static Optional<Stash> fileResponse(String filePath, Stash opts) {
         File file = findFile(filePath, opts);
         if (file != null) {
-            StringMap data = fileData(file);
+            Stash data = fileData(file);
             return optional(lastModified(
                     contentLength(
                             response(
-                                    data.string("content")),
-                            data.integer("content-length")),
-                    data.date("last-modified").toDate()));
+                                    data.get("content")),
+                            data.i("content-length")),
+                    data.get("last-modified")));
         }
         return optional();
     }
 
     public static File urlAsFile(URL u) {
-        return new File(decode(u
-                .getFile()
-                .replace('/', File.separatorChar)
-                .replace('+', rethrow(
-                        () -> encode("+", "UTF-8")).charAt(0))), "UTF-8");
+        return new File(
+                rethrow(
+                        () -> decode(
+                                u
+                                        .getFile()
+                                        .replace('/', File.separatorChar)
+                                        .replace('+', rethrow(
+                                                () -> encode("+", "UTF-8")).charAt(0)), "UTF-8")), "UTF-8");
     }
 
-    public static StringMap contentType(StringMap resp, String contentType) {
+    public static Stash contentType(Stash resp, String contentType) {
         return header(resp, "Content-Type", contentType);
     }
 
 
-    public static String getHeader(StringMap resp, String headerName) {
-        return resp.smap("headers").string(headerName);
+    public static String getHeader(Stash resp, String headerName) {
+        return ((Stash) resp.get("headers")).get(headerName);
     }
 
-    public static StringMap updateHeader(StringMap resp, String headerName, Function<String, String> upD) {
-        StringMap headers = resp.smap("headers");
-        return headers.put(headerName, upD.apply(headers.string("headerName")));
+    public static Stash updateHeader(Stash resp, String headerName, Function<String, String> upD) {
+        Stash headers = resp.get("headers");
+        return headers.update(headerName, upD.apply(headers.get("headerName")));
     }
 
-    public static StringMap charset(StringMap resp, String charset) {
+    public static Stash charset(Stash resp, String charset) {
         return updateHeader(resp, "Content-Type",
                 (ct) -> maybeNull(ct, c -> c, () -> "text/plain")
                         .replace(";\\s*charset=[^;]*", "") + "; charset=" + charset);
     }
 
-    public static Optional<String> getCharset(StringMap resp) {
+    public static Optional<String> getCharset(Stash resp) {
         String contentType = getHeader(resp, "Content-Type");
         Matcher hasFoundCharset = reCharset.matcher(contentType);
         if (hasFoundCharset.matches()) {
@@ -225,33 +228,33 @@ public class Response {
         return optional();
     }
 
-    public static StringMap setCookie(StringMap resp, String name, String value) {
-        return setCookie(resp, name, value, smap());
+    public static Stash setCookie(Stash resp, String name, String value) {
+        return setCookie(resp, name, value, Stash.stash());
     }
 
-    public static StringMap setCookie(StringMap resp, String name, String value, StringMap opts) {
-        return resp.smap("cookies").put(name, opts.put("value", value));
+    public static Stash setCookie(Stash resp, String name, String value, Stash opts) {
+        return resp.get("cookies", Stash.class).update(name, opts.update("value", value));
     }
 
-    public static boolean isReponse(StringMap resp) {
-        return resp.intish("status").isPresent() &&
-                resp.smapish("headers").isPresent();
+    public static boolean isReponse(Stash resp) {
+        return resp.maybe("status").isPresent() &&
+                resp.maybe("headers").isPresent();
     }
 
-    public static Optional<StringMap> resourceData(URL url) {
+    public static Optional<Stash> resourceData(URL url) {
         switch (url.getProtocol().toLowerCase()) {
             case "url":
                 return fileResourceData(url);
             case "jar":
-                return jarResourceData();
+                return jarResourceData(url);
             default:
-                return smap(
+                return optional(stash(
                         "content", "",
-                        "content-length", null, "last-modified", null);
+                        "content-length", null, "last-modified", null));
         }
     }
 
-    public static Optional<StringMap> fileResourceData(URL url) {
+    public static Optional<Stash> fileResourceData(URL url) {
         File file = urlAsFile(url);
         if (file.exists()) {
             if (!file.isDirectory()) {
@@ -261,20 +264,20 @@ public class Response {
         return optional();
     }
 
-    public static Optional<StringMap> jarResourceData(URL url) {
+    public static Optional<Stash> jarResourceData(URL url) {
         URLConnection conn = rethrow(() -> url.openConnection());
 
         if (conn instanceof JarURLConnection) {
             return isJARDirectory(
                     (JarURLConnection) conn) ?
                     optional(
-                            smap(
+                            Stash.stash(
                                     "content", rethrow(() -> conn.getInputStream()),
                                     "content-length", connectionContentLength(conn),
                                     "last-modified", connectionLastModified(conn))) :
-                    optional(smap());
+                    optional(Stash.stash());
         }
-        return optional(smap());
+        return optional(Stash.stash());
     }
 
     public static String addEndingSlash(String path) {
@@ -299,13 +302,13 @@ public class Response {
     }
 
 
-    public static Optional<StringMap> urlResponse(URL url){
-        Optional<StringMap> odata = resourceData(url);
-        if(odata.isPresent()){
-            StringMap data = odata.get();
-            String content = optionally_(data.stringMaybe("content"), f->f, ()-> "");
-            Integer contentLength = optionally_(data.integerMaybe("content-length"), f -> f, () -> 0);
-            Number lastModified = optionally_(data.longMaybe("last-modified"), f -> f, () -> 0);
+    public static Optional<Stash> urlResponse(URL url) {
+        Optional<Stash> odata = resourceData(url);
+        if (odata.isPresent()) {
+            Stash data = odata.get();
+            String content = optionally(data.<String>optional("content"), f -> f, () -> "");
+            Integer contentLength = optionally(data.<Integer>optional("content-length"), f -> f, () -> 0);
+            Number lastModified = optionally(data.<Number>optional("last-modified"), f -> f, () -> 0);
             return optional(
                     lastModified(
                             contentLength(
@@ -314,13 +317,13 @@ public class Response {
                             new Date(lastModified.longValue())));
 
         }
-            return odata;
+        return odata;
     }
 
-    public static Optional<StringMap> resourceResponse(String path, String root, ClassLoader loader){
+    public static Optional<Stash> resourceResponse(String path, String root, ClassLoader loader) {
         String base = (root + "/" + path)
-                        .replace("//", "/")
-                        .replaceAll("^/", "");
+                .replace("//", "/")
+                .replaceAll("^/", "");
         URL url = loader != null ? loader.getResource(base) :
                 Object.class.getResource(base);
         return urlResponse(url);

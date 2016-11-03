@@ -43,7 +43,7 @@ public class Time {
     }
 
     public static Date parseDate(String httpDate){
-        return optionally_(takeWhile(
+        return optionally(takeWhile(
                 map(
                         HTTPDateFormats.values(),
                         key -> lazy(() -> attemptParse(trimQuotes(httpDate), key))),
