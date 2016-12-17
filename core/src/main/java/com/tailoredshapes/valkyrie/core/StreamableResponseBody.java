@@ -8,40 +8,24 @@ import java.util.Collection;
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.die;
 import static com.tailoredshapes.underbar.Die.rethrow;
-import static com.tailoredshapes.underbar.UnderBar.optionally;
+import static com.tailoredshapes.underbar.IO.responseWriter;
 import static com.tailoredshapes.valkyrie.util.Response.getCharset;
 
 public class StreamableResponseBody {
 
-    public static BufferedWriter responseWriter(Stash response, OutputStream outputStream) {
-        return optionally(
-                getCharset(response),
-                (charset) -> writer(outputStream, stash("encoding", charset)),
-                () -> writer(outputStream));
-    }
-
-
-    private static BufferedWriter writer(OutputStream outputStream, Stash opts) {
-        return new BufferedWriter(new PrintWriter(outputStream));
-    }
-
-    private static BufferedWriter writer(OutputStream outputStream) {
-        return new BufferedWriter(new PrintWriter(outputStream));
-    }
-
     public static void writeBodyToStream(String body, Stash response, OutputStream outputStream) {
-        try (BufferedWriter writer = responseWriter(response, outputStream)) {
+        try (BufferedWriter writer = responseWriter(outputStream, stash("encoding", getCharset(response)))) {
             writer.write(body);
         } catch (IOException e) {
-            throw die(e, "Could not open response");
+            die(e, "Could not open response");
         }
     }
 
     public static void writeBodyToStream(Collection<Object> body, Stash response, OutputStream outputStream) {
-        try (BufferedWriter writer = responseWriter(response, outputStream)) {
+        try (BufferedWriter writer = responseWriter(outputStream, stash("encoding", getCharset(response)))) {
             body.stream().forEach((s) -> rethrow(() -> writer.write(s.toString())));
         } catch (IOException e) {
-            throw die(e, "Could not open response");
+            die(e, "Could not open response");
         }
     }
 

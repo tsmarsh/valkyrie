@@ -6,6 +6,10 @@
   <artifactId>core</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <description>
+    A Java 8 port of Clojure Ring
+  </description>
+
   <packaging>jar</packaging>
 
   <name>core</name>
@@ -47,7 +51,6 @@
         </configuration>
       </plugin>
     </plugins>
-
   </build>
 
 
@@ -55,12 +58,17 @@
     <dependency>
       <groupId>com.tailoredshapes.underbar</groupId>
       <artifactId>core</artifactId>
-      <version>0.0.2</version>
+      <version>0.0.4-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>com.tailoredshapes.underbar</groupId>
       <artifactId>stash</artifactId>
-      <version>0.0.2</version>
+      <version>0.0.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tailoredshapes.underbar</groupId>
+      <artifactId>io</artifactId>
+      <version>0.0.4-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
