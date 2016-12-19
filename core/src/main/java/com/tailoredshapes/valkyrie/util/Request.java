@@ -3,11 +3,11 @@ package com.tailoredshapes.valkyrie.util;
 import com.tailoredshapes.stash.Stash;
 
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.tailoredshapes.underbar.UnderBar.optional;
+import static com.tailoredshapes.underbar.UnderBar.optionally;
 import static com.tailoredshapes.underbar.UnderBar.second;
 import static com.tailoredshapes.underbar.UnderReg.*;
 import static com.tailoredshapes.underbar.UnderString.join;
@@ -44,7 +44,7 @@ public class Request {
             String type = request.<Stash>get("headers").get("content-type");
             Matcher matcher = pattern("^(.*?)(?:;|$)").matcher(type);
             if (matcher.matches()) {
-                return optional(matcher.group(2));
+                return optional(matcher.group(1));
             }
         }
         return optional();
@@ -58,5 +58,10 @@ public class Request {
                                 (String type) -> second(groups(matcher(reCharset, type)))));
     }
 
+    public static boolean isURLEncodedForm(Stash request){
+        return optionally(contentType(request),
+                (type) -> type.startsWith("application/x-www-form-urlencoded"),
+                () -> false);
+    }
 
 }
