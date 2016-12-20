@@ -6,9 +6,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.tailoredshapes.underbar.UnderBar.optional;
-import static com.tailoredshapes.underbar.UnderBar.optionally;
-import static com.tailoredshapes.underbar.UnderBar.second;
+import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.underbar.UnderReg.*;
 import static com.tailoredshapes.underbar.UnderString.join;
 import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
@@ -51,11 +49,14 @@ public class Request {
     }
 
     public static Optional<String> characterEncoding(Stash request) {
-
-        return request.ifLet("headers",
-                (Stash h) ->
-                        h.ifLetPun("content-type",
-                                (String type) -> second(groups(matcher(reCharset, type)))));
+        if(request.contains("headers")){
+            Stash headers = request.get("headers", Stash.class);
+            if(headers.contains("content-type")){
+                String type = headers.asString("content-type");
+                return optional(first(groups(matcher(reCharset, type))));
+            }
+        }
+        return optional();
     }
 
     public static boolean isURLEncodedForm(Stash request){
