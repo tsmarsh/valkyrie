@@ -18,8 +18,8 @@ import java.util.zip.ZipEntry;
 
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.rethrow;
+import static com.tailoredshapes.underbar.IO.lastModifiedDate;
 import static com.tailoredshapes.underbar.UnderBar.*;
-import static com.tailoredshapes.valkyrie.util.IO.lastModifiedDate;
 import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
 import static com.tailoredshapes.valkyrie.util.Time.formatDate;
 import static java.net.URLDecoder.decode;
@@ -204,8 +204,8 @@ public class Response {
     }
 
 
-    public static String getHeader(Stash resp, String headerName) {
-        return ((Stash) resp.get("headers")).get(headerName);
+    public static Optional<String> getHeader(Stash resp, String headerName) {
+        return ((Stash) resp.get("headers")).maybe(headerName);
     }
 
     public static Stash updateHeader(Stash resp, String headerName, Function<String, String> upD) {
@@ -220,11 +220,14 @@ public class Response {
     }
 
     public static Optional<String> getCharset(Stash resp) {
-        String contentType = getHeader(resp, "Content-Type");
-        Matcher hasFoundCharset = reCharset.matcher(contentType);
-        if (hasFoundCharset.matches()) {
-            return optional(hasFoundCharset.group(1));
+        Optional<String> contentType = getHeader(resp, "Content-Type");
+        if(contentType.isPresent()){
+            Matcher hasFoundCharset = reCharset.matcher(contentType.get());
+            if (hasFoundCharset.matches()) {
+                return optional(hasFoundCharset.group(1));
+            }
         }
+
         return optional();
     }
 
