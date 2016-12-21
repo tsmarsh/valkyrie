@@ -2,10 +2,13 @@ package com.tailoredshapes.valkyrie.util;
 
 import com.tailoredshapes.stash.Stash;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.tailoredshapes.underbar.IO.slurp;
 import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.underbar.UnderReg.*;
 import static com.tailoredshapes.underbar.UnderString.join;
@@ -49,9 +52,9 @@ public class Request {
     }
 
     public static Optional<String> characterEncoding(Stash request) {
-        if(request.contains("headers")){
+        if (request.contains("headers")) {
             Stash headers = request.get("headers", Stash.class);
-            if(headers.contains("content-type")){
+            if (headers.contains("content-type")) {
                 String type = headers.asString("content-type");
                 return optional(first(groups(matcher(reCharset, type))));
             }
@@ -59,10 +62,51 @@ public class Request {
         return optional();
     }
 
-    public static boolean isURLEncodedForm(Stash request){
+    public static boolean isURLEncodedForm(Stash request) {
         return optionally(contentType(request),
                 (type) -> type.startsWith("application/x-www-form-urlencoded"),
                 () -> false);
     }
 
+    public static Optional<String> bodyString(Stash request) {
+        Optional body = request.maybe("body");
+
+        if (body.isPresent()) {
+            Object bodyObject = body.get();
+            if (bodyObject instanceof String) {
+                return optional((String) bodyObject);
+            }
+
+            if (bodyObject instanceof File) {
+                return optional(slurp((File) bodyObject));
+            }
+
+            if (bodyObject instanceof InputStream) {
+                return optional(slurp((InputStream) bodyObject));
+            }
+        }
+
+        return optional();
+    }
+
+    public static Optional<String> pathInfo(Stash request) {
+        Optional<String> pathInfo = request.maybe("path-info");
+        if (pathInfo.isPresent()) return pathInfo;
+        Optional<String> uri = request.maybe("uri");
+        if (uri.isPresent()) return uri;
+        return optional();
+    }
+
+    public static boolean hasContext(Stash request, String context){
+        Optional<String> uri = request.maybe("uri");
+        if(uri.isPresent()){
+            return uri.get().startsWith(context);
+        }
+        return false;
+    }
+
+    public static Stash setContext(Stash request, String context){
+        String uri = request.get("uri");
+        return request.assoc("context", context).assoc("path-info", uri.substring(context.length()));
+    }
 }
