@@ -17,7 +17,7 @@ public class StreamableResponseBodyTest {
     public void canWriteStrings() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Stash response = stash("body", "Hello, World!", "headers", stash());
-        writeBodyToStream((String)response.get("body"), response, output);
+        writeBodyToStream(response.get("body"), response, output);
 
         assertEquals("Hello, World!", output.toString());
     }
@@ -26,7 +26,7 @@ public class StreamableResponseBodyTest {
     public void canWriteStringsWithEncoding() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Stash response = stash("body", "Hello, World!", "headers", stash("Content-Type", "text/plain; charset=UTF-16"));
-        writeBodyToStream((String)response.get("body"), response, output);
+        writeBodyToStream(response.get("body"), response, output);
 
         assertEquals("Hello, World!", output.toString("UTF-16"));
     }

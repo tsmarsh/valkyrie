@@ -8,11 +8,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,11 +29,11 @@ import static java.util.Collections.list;
  * Created by tmarsh on 12/21/16.
  */
 public class Servlet {
-    private static Stash getHeaders(HttpServletRequest request){
+    private static Stash getHeaders(HttpServletRequest request) {
         Stash headers = new Stash();
         Enumeration<String> headerNames = request.getHeaderNames();
-        while(headerNames.hasMoreElements()){
-            String headerName =  headerNames.nextElement();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement();
             Enumeration<String> values = request.getHeaders(headerName);
             headers = headers.assoc(headerName.toLowerCase(), commaSep(list(values)));
         }
@@ -40,7 +41,7 @@ public class Servlet {
         return headers;
     }
 
-    private static Optional<Integer> getContentLength(HttpServletRequest request){
+    private static Optional<Integer> getContentLength(HttpServletRequest request) {
         int contentLength = request.getContentLength();
         return contentLength > 0 ? optional(contentLength) : optional();
     }
@@ -50,7 +51,7 @@ public class Servlet {
         return certs.length > 0 ? optional(certs[1]) : optional();
     }
 
-    public static Stash buildRequestMap(HttpServletRequest request){
+    public static Stash buildRequestMap(HttpServletRequest request) {
         return stash(
                 "server-port", request.getServerPort(),
                 "server-name", request.getServerName(),
@@ -69,7 +70,7 @@ public class Servlet {
         );
     }
 
-    public static Stash mergeServletKeys(Stash requestMap, HttpServlet servlet, HttpServletRequest request, HttpServletResponse response){
+    public static Stash mergeServletKeys(Stash requestMap, HttpServlet servlet, HttpServletRequest request, HttpServletResponse response) {
         return requestMap.merge(stash(
                 "servlet", servlet,
                 "servlet-request", request,
@@ -79,17 +80,17 @@ public class Servlet {
         ));
     }
 
-    private static HttpServletResponse setHeaders(HttpServletResponse response, Stash headers){
+    private static HttpServletResponse setHeaders(HttpServletResponse response, Stash headers) {
         headers.toMap().forEach((key, valOrVals) -> {
-            if(valOrVals instanceof String){
+            if (valOrVals instanceof String) {
                 response.setHeader(key, (String) valOrVals);
-            } else if (valOrVals instanceof Collection){
+            } else if (valOrVals instanceof Collection) {
                 Collection<String> vals = (Collection<String>) valOrVals;
-                for(String val : vals){
+                for (String val : vals) {
                     response.addHeader(key, val);
                 }
             } else if (valOrVals instanceof String[]) {
-                for(String val : (String[])valOrVals){
+                for (String val : (String[]) valOrVals) {
                     response.addHeader(key, val);
                 }
             }
@@ -97,11 +98,11 @@ public class Servlet {
         return response;
     }
 
-    private static OutputStream makeOutputStream(HttpServletResponse response, AsyncContext context){
-        if(context == null){
+    private static OutputStream makeOutputStream(HttpServletResponse response, AsyncContext context) {
+        if (context == null) {
             return rethrow(() -> response.getOutputStream());
         } else {
-            return new FilterOutputStream(rethrow(() ->response.getOutputStream())){
+            return new FilterOutputStream(rethrow(() -> response.getOutputStream())) {
                 @Override
                 public void close() throws IOException {
                     context.complete();
@@ -111,45 +112,37 @@ public class Servlet {
         }
     }
 
-    public static HttpServletResponse updateServletResponse(HttpServletResponse response, Stash responseMap){
+    public static HttpServletResponse updateServletResponse(HttpServletResponse response, Stash responseMap) {
         return updateServletResponse(response, null, responseMap);
     }
 
-    public static HttpServletResponse updateServletResponse(HttpServletResponse response, AsyncContext context, Stash responseMap){
-        assert(responseMap != null);
-        assert(response != null);
+    public static HttpServletResponse updateServletResponse(HttpServletResponse response, AsyncContext context, Stash responseMap) {
+        assert (responseMap != null);
+        assert (response != null);
 
-        if (responseMap.contains("status")) {response.setStatus(responseMap.i("status"));}
+        if (responseMap.contains("status")) {
+            response.setStatus(responseMap.i("status"));
+        }
         setHeaders(response, responseMap.get("headers"));
 
         OutputStream os = makeOutputStream(response, context);
         Object body = responseMap.get("body");
 
-        //There has to be a better way of doing this... call sites?
-
-        if(body instanceof String) {
-            writeBodyToStream((String) body, responseMap, os);
-        } else if (body instanceof Collection){
-            writeBodyToStream((Collection<Object>) body, responseMap, os);
-        } else if (body instanceof InputStream){
-            writeBodyToStream((InputStream) body, responseMap, os);
-        } else if (body instanceof File){
-            writeBodyToStream((File) body, responseMap, os);
-        }
+        writeBodyToStream(body, responseMap, os);
 
         return response;
     }
 
-    private static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(Runnable handler){
+    public static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(Function<Stash, Stash> handler) {
         return (servlet, request, response) -> {
             Stash requestMap = buildRequestMap(request);
             requestMap = mergeServletKeys(requestMap, servlet, request, response);
-            handler.run();
+            requestMap = handler.apply(requestMap);
             updateServletResponse(response, requestMap);
         };
     }
 
-    private static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler){
+    public static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
         return (servlet, request, response) -> {
             AsyncContext context = request.startAsync();
             Stash requestMap = mergeServletKeys(buildRequestMap(request), servlet, request, response);
@@ -157,7 +150,7 @@ public class Servlet {
         };
     }
 
-    public static HttpServlet servlet(Runnable handler) {
+    public static HttpServlet servlet(Function<Stash, Stash> handler) {
         RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> serviceMethod = makeServiceMethod(handler);
         return new HttpServlet() {
             @Override

@@ -7,11 +7,19 @@
   <groupId>com.tailoredshapes</groupId>
   <artifactId>valkyrie</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>pom</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.tailoredshapes.underbar</groupId>
+            <artifactId>stash</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+    <packaging>pom</packaging>
 
   <modules>
     <module>core</module>
     <module>servlet</module>
+    <module>jetty-adapter</module>
   </modules>
 
   <distributionManagement>
