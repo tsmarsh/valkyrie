@@ -48,7 +48,7 @@ public class Servlet {
 
     private static Optional<X509Certificate> getClientCert(HttpServletRequest request) {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-        return certs.length > 0 ? optional(certs[1]) : optional();
+        return certs != null && certs.length > 0 ? optional(certs[1]) : optional();
     }
 
     public static Stash buildRequestMap(HttpServletRequest request) {
