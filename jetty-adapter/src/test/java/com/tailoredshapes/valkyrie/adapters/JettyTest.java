@@ -1,4 +1,4 @@
-package com.tailoredshapes.valkyrie.servlet;
+package com.tailoredshapes.valkyrie.adapters;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -6,35 +6,22 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServlet;
-
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.valkyrie.servlet.Servlet.servlet;
-import static org.junit.Assert.assertEquals;
+import static com.tailoredshapes.valkyrie.adapters.Jetty.runJetty;
+import static org.junit.Assert.*;
 
-public class ServletTest {
-
+/**
+ * Created by tmarsh on 1/20/17.
+ */
+public class JettyTest {
     @Test
-    public void shouldCreateAServletFromAHandler() throws Exception {
-        Server server = new Server(6666);
-
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-        server.setHandler(context);
-
-
-        HttpServlet servlet = servlet((req) -> stash(
+    public void shouldStartAJettyServer() throws Exception {
+        Server server = runJetty((req) -> stash(
                 "status", 200,
                 "headers", stash("Content-Type", "text/plain"),
-                "body", "Hello, World"));
-
-        context.addServlet(new ServletHolder(servlet), "/*");
-
+                "body", "Hello, World"), stash("join?", false));
 
         server.start();
 
