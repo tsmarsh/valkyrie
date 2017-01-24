@@ -10,18 +10,21 @@ import org.junit.Test;
 
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.valkyrie.adapters.Jetty.runJetty;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by tmarsh on 1/20/17.
  */
 public class JettyTest {
+
     @Test
     public void shouldStartAJettyServer() throws Exception {
-        Server server = runJetty((req) -> stash(
-                "status", 200,
-                "headers", stash("Content-Type", "text/plain"),
-                "body", "Hello, World"), stash("join?", false));
+        Server server = runJetty((req) ->
+                        stash(
+                                "status", 200,
+                                "headers", stash("Content-Type", "text/plain"),
+                                "body", "Hello, World"),
+                        stash("join?", false, "port", 6666));
 
         server.start();
 

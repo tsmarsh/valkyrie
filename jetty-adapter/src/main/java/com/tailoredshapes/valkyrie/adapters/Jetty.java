@@ -51,7 +51,7 @@ public class Jetty {
         HttpConnectionFactory connectionFactory = new HttpConnectionFactory(httpConfig(options));
         ServerConnector serverConnector = new ServerConnector(server, connectionFactory);
         serverConnector.setPort(options.get("port", 80));
-        serverConnector.setHost(options.get("host"));
+        serverConnector.setHost(options.get("host", "localhost"));
         serverConnector.setIdleTimeout(options.get("max-idle-time", 200000));
         return serverConnector;
     }
@@ -121,7 +121,7 @@ public class Jetty {
 
     private static Server createServer(Stash options){
         Server server = new Server(createThreadPool(options));
-        if(options.get("http?")){
+        if(options.get("http?",true)){
             server.addConnector(httpConnector(server, options));
         }
         if(options.get("ssl?", false) || options.contains("ssl-port")){
@@ -164,7 +164,7 @@ public class Jetty {
      */
 
     public static Server runJetty(Function<Stash, Stash> handler, Stash options){
-        Server server = createServer(options.remove("configurator"));
+        Server server = createServer(options.dissoc("configurator"));
         server.setHandler(proxyHandler(handler));
         if(options.contains("configurator")){
             Consumer<Server> configurator = options.get("configurator");
