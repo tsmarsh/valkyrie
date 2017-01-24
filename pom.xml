@@ -7,11 +7,40 @@
   <groupId>com.tailoredshapes</groupId>
   <artifactId>valkyrie</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+
+  <url>https://github.com/tsmarsh/valkyrie</url>
+
+  <developers>
+    <developer>
+      <id>tsmarsh</id>
+      <name>Tom Marsh</name>
+      <organization>TailoredShapes</organization>
+      <url>http://tailoredshapes.com</url>
+    </developer>
+  </developers>
+
+  <issueManagement>
+    <url>https://github.com/tsmarsh/valkyrie/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <prerequisites>
+    <maven>3.0.1</maven>
+  </prerequisites>
+
     <dependencies>
         <dependency>
             <groupId>com.tailoredshapes.underbar</groupId>
             <artifactId>stash</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.1.0</version>
         </dependency>
     </dependencies>
     <packaging>pom</packaging>
@@ -21,52 +50,6 @@
     <module>servlet</module>
     <module>jetty-adapter</module>
   </modules>
-
-  <distributionManagement>
-    <repository>
-      <id>boardandtiger</id>
-      <name>Board &amp; Tiger Releases</name>
-      <url>https://artifactory.boardandtiger.com/artifactory/libs-release-local</url>
-    </repository>
-    <snapshotRepository>
-      <id>boardandtiger</id>
-      <name>Board &amp; Tiger Snapshots</name>
-      <url>https://artifactory.boardandtiger.com/artifactory/libs-snapshot-local</url>
-    </snapshotRepository>
-  </distributionManagement>
-  
-  <repositories>
-    <repository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>central</id>
-      <name>libs-release</name>
-      <url>https://artifactory.boardandtiger.com/artifactory/libs-release</url>
-    </repository>
-    <repository>
-      <snapshots />
-      <id>snapshots</id>
-      <name>libs-snapshot</name>
-      <url>https://artifactory.boardandtiger.com/artifactory/libs-snapshot</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <id>central</id>
-      <name>plugins-release</name>
-      <url>https://artifactory.boardandtiger.com/artifactory/plugins-release</url>
-    </pluginRepository>
-    <pluginRepository>
-      <snapshots />
-      <id>snapshots</id>
-      <name>plugins-snapshot</name>
-      <url>https://artifactory.boardandtiger.com/artifactory/plugins-snapshot</url>
-    </pluginRepository>
-  </pluginRepositories>
 
   <build>
     <plugins>
