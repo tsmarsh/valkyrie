@@ -10,6 +10,10 @@
     <name>Valkyrie</name>
     <url>https://github.com/tsmarsh/valkyrie</url>
 
+    <description>
+      A port of Clojure's Ring to Java with UnderBar.
+    </description>
+    
     <developers>
         <developer>
             <id>tsmarsh</id>
