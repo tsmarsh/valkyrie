@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.IO.file;
 import static com.tailoredshapes.underbar.IO.resource;
+import static com.tailoredshapes.underbar.UnderBar.list;
 import static com.tailoredshapes.valkyrie.servlet.Servlet.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -42,7 +43,10 @@ public class ServletTest {
             "headers", stash("Content-Type", "text/plain"),
             "body", this.getClass().getResourceAsStream("/hello.txt"));
 
-
+    private Stash collectionResponse = stash(
+            "status", 200,
+            "headers", stash("Content-Type", "text/plain"),
+            "body", list("1", 2, "Hello, World"));
     @Before
     public void setUp() throws Exception {
         server = new Server(6666);
@@ -86,6 +90,15 @@ public class ServletTest {
     }
 
     @Test
+    public void shouldCreateAServletFromACollectionHandler() throws Exception {
+        HttpServlet servlet = servlet((req) -> collectionResponse);
+
+        context.addServlet(new ServletHolder(servlet), "/*");
+
+        getResource();
+    }
+
+    @Test
     public void shouldCreateAServletFromAnAsyncHandler() throws Exception {
         HttpServlet servlet = servlet((request, onSuccess, onError) -> onSuccess.apply(response));
 
@@ -120,6 +133,6 @@ public class ServletTest {
         assertEquals(200, response.getStatusLine().getStatusCode());
         assertEquals("text/plain", response.getFirstHeader("Content-Type").getValue());
         String body = EntityUtils.toString(response.getEntity());
-        assertEquals("Hello, World", body);
+        assertTrue(body.contains("Hello, World"));
     }
 }
