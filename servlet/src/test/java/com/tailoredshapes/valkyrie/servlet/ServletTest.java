@@ -47,6 +47,7 @@ public class ServletTest {
             "status", 200,
             "headers", stash("Content-Type", "text/plain"),
             "body", list("1", 2, "Hello, World"));
+
     @Before
     public void setUp() throws Exception {
         server = new Server(6666);
@@ -96,6 +97,25 @@ public class ServletTest {
         context.addServlet(new ServletHolder(servlet), "/*");
 
         getResource();
+    }
+
+    @Test
+    public void shouldReturn500WhenFileIsMissing() throws Exception {
+        HttpServlet servlet = servlet((req) -> stash(
+                "status", 200,
+                "headers", stash("Content-Type", "text/plain"),
+                "body", this.getClass().getResourceAsStream("/missing.txt")));
+
+        context.addServlet(new ServletHolder(servlet), "/*");
+
+        server.start();
+
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet get = new HttpGet("http://localhost:6666");
+        CloseableHttpResponse response = client.execute(get);
+        assertEquals(500, response.getStatusLine().getStatusCode());
+
+        server.stop();
     }
 
     @Test
