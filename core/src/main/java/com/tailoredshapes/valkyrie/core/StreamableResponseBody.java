@@ -6,11 +6,15 @@ import com.tailoredshapes.underbar.function.RegularFunctions;
 import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.*;
 import static com.tailoredshapes.underbar.IO.responseWriter;
+import static com.tailoredshapes.underbar.UnderBar.filter;
+import static com.tailoredshapes.underbar.UnderBar.first;
 import static com.tailoredshapes.valkyrie.util.Response.getCharset;
 
 public class StreamableResponseBody {
@@ -61,11 +65,18 @@ public class StreamableResponseBody {
     }
 
     public static <T> void writeBodyToStream(T t, Stash response, OutputStream outputStream){
-        dieIfMissing(impls, t.getClass(), () -> "No implementation for " + t.getClass().getName());
         RegularFunctions.TriConsumer<T, Stash, OutputStream> stashOutputStreamTriConsumer;
-        synchronized (impls){
-            stashOutputStreamTriConsumer = (RegularFunctions.TriConsumer<T, Stash, OutputStream>) impls.get(t.getClass());
+
+        if(impls.containsKey(t.getClass())){
+            synchronized (impls){
+                stashOutputStreamTriConsumer = (RegularFunctions.TriConsumer<T, Stash, OutputStream>) impls.get(t.getClass());
+            }
+        } else {
+            List<Class> handlers = filter(impls.keySet(), (Class k) -> k.isAssignableFrom(t.getClass()));
+            Class targetClass = first(dieIfEmpty(handlers, () -> "No implementation for " + t.getClass().getName()));
+            stashOutputStreamTriConsumer = (RegularFunctions.TriConsumer<T, Stash, OutputStream>) impls.get(targetClass);
         }
+
         stashOutputStreamTriConsumer.accept(t, response, outputStream);
     }
 }

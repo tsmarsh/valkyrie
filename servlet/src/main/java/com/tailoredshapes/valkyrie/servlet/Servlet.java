@@ -5,6 +5,7 @@ import com.tailoredshapes.underbar.function.RegularFunctions;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -145,8 +146,20 @@ public class Servlet {
     public static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
         return (servlet, request, response) -> {
             AsyncContext context = request.startAsync();
-            Stash requestMap = mergeServletKeys(buildRequestMap(request), servlet, request, response);
-            handler.accept(requestMap, (respMap) -> updateServletResponse(response, context, respMap), (e) -> rethrow(() -> response.sendError(500, e.getMessage())));
+
+            Stash requestMap = mergeServletKeys(
+                    buildRequestMap(request),
+                    servlet,
+                    request,
+                    response);
+
+            handler.accept(
+                    requestMap,
+                    (respMap) -> updateServletResponse(response, context, respMap),
+                    (e) -> rethrow(() -> {
+                        response.sendError(500, e.getMessage());
+                        context.complete();
+                    }));
         };
     }
 

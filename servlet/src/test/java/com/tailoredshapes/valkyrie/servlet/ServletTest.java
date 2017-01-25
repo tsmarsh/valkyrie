@@ -16,8 +16,11 @@ import org.junit.Test;
 import javax.servlet.http.HttpServlet;
 
 import static com.tailoredshapes.stash.Stash.stash;
+import static com.tailoredshapes.underbar.IO.file;
+import static com.tailoredshapes.underbar.IO.resource;
 import static com.tailoredshapes.valkyrie.servlet.Servlet.servlet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ServletTest {
 
@@ -29,9 +32,19 @@ public class ServletTest {
             "headers", stash("Content-Type", "text/plain"),
             "body", "Hello, World");
 
+    private Stash fileResponse = stash(
+            "status", 200,
+            "headers", stash("Content-Type", "text/plain"),
+            "body", file(resource("/hello.txt")));
+
+    private Stash streamResponse = stash(
+            "status", 200,
+            "headers", stash("Content-Type", "text/plain"),
+            "body", this.getClass().getResourceAsStream("/hello.txt"));
+
+
     @Before
     public void setUp() throws Exception {
-
         server = new Server(6666);
 
         context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -40,23 +53,36 @@ public class ServletTest {
         server.setHandler(context);
     }
 
+    @After
+    public void tearDown() throws Exception {
+        server.stop();
+    }
+
     @Test
     public void shouldCreateAServletFromAHandler() throws Exception {
         HttpServlet servlet = servlet((req) -> response);
 
         context.addServlet(new ServletHolder(servlet), "/*");
 
-        server.start();
+        getResource();
+    }
 
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet get = new HttpGet("http://localhost:6666");
-        CloseableHttpResponse response = client.execute(get);
-        assertEquals(200, response.getStatusLine().getStatusCode());
-        assertEquals("text/plain", response.getFirstHeader("Content-Type").getValue());
-        String body = EntityUtils.toString(response.getEntity());
-        assertEquals("Hello, World", body);
+    @Test
+    public void shouldCreateAServletFromAFileHandler() throws Exception {
+        HttpServlet servlet = servlet((req) -> fileResponse);
 
-        server.stop();
+        context.addServlet(new ServletHolder(servlet), "/*");
+
+        getResource();
+    }
+
+    @Test
+    public void shouldCreateAServletFromAStreamHandler() throws Exception {
+        HttpServlet servlet = servlet((req) -> streamResponse);
+
+        context.addServlet(new ServletHolder(servlet), "/*");
+
+        getResource();
     }
 
     @Test
@@ -65,8 +91,29 @@ public class ServletTest {
 
         context.addServlet(new ServletHolder(servlet), "/*");
 
+        getResource();
+    }
+
+    @Test
+    public void shouldCreateAServletFromAnAsyncHandlerThatFails() throws Exception {
+        HttpServlet servlet = servlet((request, onSuccess, onError) -> onError.accept(new RuntimeException("failure")));
+
+        context.addServlet(new ServletHolder(servlet), "/*");
+
         server.start();
 
+        CloseableHttpClient client = HttpClients.createDefault();
+        HttpGet get = new HttpGet("http://localhost:6666");
+        CloseableHttpResponse response = client.execute(get);
+        assertEquals(500, response.getStatusLine().getStatusCode());
+        String body = EntityUtils.toString(response.getEntity());
+        assertTrue(body.contains("failure"));
+
+        server.stop();
+    }
+
+    private void getResource() throws Exception {
+        server.start();
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet("http://localhost:6666");
         CloseableHttpResponse response = client.execute(get);
@@ -74,7 +121,5 @@ public class ServletTest {
         assertEquals("text/plain", response.getFirstHeader("Content-Type").getValue());
         String body = EntityUtils.toString(response.getEntity());
         assertEquals("Hello, World", body);
-
-        server.stop();
     }
 }
