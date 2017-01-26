@@ -19,11 +19,6 @@ import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
  */
 public class Request {
 
-    Pattern charsetPattern = pattern(join(
-            ";(?:.*\\s)?(?i:charset)=(",
-            Parsing.value,
-            ")\\s*(?:;|$)"));
-
     public static String requestURL(Stash request) {
 
         String url = join(
