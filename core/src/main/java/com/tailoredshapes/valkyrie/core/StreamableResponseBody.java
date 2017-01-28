@@ -69,12 +69,12 @@ public class StreamableResponseBody {
 
         if(impls.containsKey(t.getClass())){
             synchronized (impls){
-                stashOutputStreamTriConsumer = impls.get(t.getClass());
+                stashOutputStreamTriConsumer = (RegularFunctions.TriConsumer<T, Stash, OutputStream>) impls.get(t.getClass());
             }
         } else {
             List<Class> handlers = filter(impls.keySet(), (Class k) -> k.isAssignableFrom(t.getClass()));
             Class targetClass = first(dieIfEmpty(handlers, () -> "No implementation for " + t.getClass().getName()));
-            stashOutputStreamTriConsumer = impls.get(targetClass);
+            stashOutputStreamTriConsumer = (RegularFunctions.TriConsumer<T, Stash, OutputStream>) impls.get(targetClass);
         }
 
         stashOutputStreamTriConsumer.accept(t, response, outputStream);
