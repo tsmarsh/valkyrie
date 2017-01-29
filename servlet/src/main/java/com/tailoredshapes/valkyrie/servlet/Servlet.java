@@ -29,8 +29,8 @@ import static java.util.Collections.list;
 /**
  * Created by tmarsh on 12/21/16.
  */
-public class Servlet {
-    private static Stash getHeaders(HttpServletRequest request) {
+public interface Servlet {
+    static Stash getHeaders(HttpServletRequest request) {
         Stash headers = new Stash();
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
@@ -42,17 +42,17 @@ public class Servlet {
         return headers;
     }
 
-    private static Optional<Integer> getContentLength(HttpServletRequest request) {
+    static Optional<Integer> getContentLength(HttpServletRequest request) {
         int contentLength = request.getContentLength();
         return contentLength > 0 ? optional(contentLength) : optional();
     }
 
-    private static Optional<X509Certificate> getClientCert(HttpServletRequest request) {
+    static Optional<X509Certificate> getClientCert(HttpServletRequest request) {
         X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
         return certs != null && certs.length > 0 ? optional(certs[1]) : optional();
     }
 
-    public static Stash buildRequestMap(HttpServletRequest request) {
+    static Stash buildRequestMap(HttpServletRequest request) {
         return stash(
                 "server-port", request.getServerPort(),
                 "server-name", request.getServerName(),
@@ -71,7 +71,7 @@ public class Servlet {
         );
     }
 
-    public static Stash mergeServletKeys(Stash requestMap, HttpServlet servlet, HttpServletRequest request, HttpServletResponse response) {
+    static Stash mergeServletKeys(Stash requestMap, HttpServlet servlet, HttpServletRequest request, HttpServletResponse response) {
         return requestMap.merge(stash(
                 "servlet", servlet,
                 "servlet-request", request,
@@ -81,7 +81,7 @@ public class Servlet {
         ));
     }
 
-    private static HttpServletResponse setHeaders(HttpServletResponse response, Stash headers) {
+    static HttpServletResponse setHeaders(HttpServletResponse response, Stash headers) {
         headers.toMap().forEach((key, valOrVals) -> {
             if (valOrVals instanceof String) {
                 response.setHeader(key, (String) valOrVals);
@@ -99,7 +99,7 @@ public class Servlet {
         return response;
     }
 
-    private static OutputStream makeOutputStream(HttpServletResponse response, AsyncContext context) {
+    static OutputStream makeOutputStream(HttpServletResponse response, AsyncContext context) {
         if (context == null) {
             return rethrow(() -> response.getOutputStream());
         } else {
@@ -113,11 +113,11 @@ public class Servlet {
         }
     }
 
-    public static HttpServletResponse updateServletResponse(HttpServletResponse response, Stash responseMap) {
+    static HttpServletResponse updateServletResponse(HttpServletResponse response, Stash responseMap) {
         return updateServletResponse(response, null, responseMap);
     }
 
-    public static HttpServletResponse updateServletResponse(HttpServletResponse response, AsyncContext context, Stash responseMap) {
+    static HttpServletResponse updateServletResponse(HttpServletResponse response, AsyncContext context, Stash responseMap) {
         assert (responseMap != null);
         assert (response != null);
 
@@ -134,7 +134,7 @@ public class Servlet {
         return response;
     }
 
-    public static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(Function<Stash, Stash> handler) {
+    static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(Function<Stash, Stash> handler) {
         return (servlet, request, response) -> {
             Stash requestMap = buildRequestMap(request);
             requestMap = mergeServletKeys(requestMap, servlet, request, response);
@@ -143,7 +143,7 @@ public class Servlet {
         };
     }
 
-    public static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
+    static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
         return (servlet, request, response) -> {
             AsyncContext context = request.startAsync();
 
@@ -163,7 +163,7 @@ public class Servlet {
         };
     }
 
-    public static HttpServlet servlet(Function<Stash, Stash> handler) {
+    static HttpServlet servlet(Function<Stash, Stash> handler) {
         RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> serviceMethod = makeServiceMethod(handler);
         return new HttpServlet() {
             @Override
@@ -173,7 +173,7 @@ public class Servlet {
         };
     }
 
-    public static HttpServlet servlet(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
+    static HttpServlet servlet(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
         RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> serviceMethod = makeServiceMethod(handler);
         return new HttpServlet() {
             @Override

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServlet;
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.IO.file;
 import static com.tailoredshapes.underbar.IO.resource;
+import static com.tailoredshapes.underbar.UnderBar.array;
 import static com.tailoredshapes.underbar.UnderBar.list;
 import static com.tailoredshapes.valkyrie.servlet.Servlet.servlet;
 import static org.junit.Assert.assertEquals;
@@ -35,12 +36,12 @@ public class ServletTest {
 
     private Stash fileResponse = stash(
             "status", 200,
-            "headers", stash("Content-Type", "text/plain"),
+            "headers", stash("Content-Type", "text/plain", "Cookie", list("foo=5", "moo=cow")),
             "body", file(resource("/hello.txt")));
 
     private Stash streamResponse = stash(
             "status", 200,
-            "headers", stash("Content-Type", "text/plain"),
+            "headers", stash("Content-Type", "text/plain", "Cookie", array("foo=5", "moo=cow")),
             "body", this.getClass().getResourceAsStream("/hello.txt"));
 
     private Stash collectionResponse = stash(
