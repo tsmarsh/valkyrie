@@ -8,6 +8,7 @@ import java.net.URL;
 import java.util.Optional;
 
 import static com.tailoredshapes.stash.Stash.stash;
+import static com.tailoredshapes.underbar.IO.file;
 import static com.tailoredshapes.underbar.IO.resource;
 import static com.tailoredshapes.valkyrie.util.Response.StatusCode.*;
 import static org.junit.Assert.*;
@@ -86,6 +87,13 @@ public class ResponseTest {
         assertTrue(findIndexFile(new File(root + "/lib2")).isPresent());
         assertTrue(findIndexFile(new File(root + "/lib3")).isPresent());
         assertFalse(findIndexFile(new File(root + "/bil")).isPresent());
+    }
+
+    @Test
+    public void canSafelyFindFile() throws Exception {
+        File expected = file(resource("/lib/index.html"));
+        File actual = safelyFindFile("lib/index.html", stash("root", this.root));
+        assertEquals(expected, actual);
     }
 
     @Test
