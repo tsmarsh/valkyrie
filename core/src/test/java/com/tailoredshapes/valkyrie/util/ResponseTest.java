@@ -3,6 +3,7 @@ package com.tailoredshapes.valkyrie.util;
 import com.tailoredshapes.stash.Stash;
 import org.junit.Test;
 
+import java.io.File;
 import java.net.URL;
 import java.util.Optional;
 
@@ -16,6 +17,8 @@ import static com.tailoredshapes.valkyrie.util.Response.*;
  * Created by tmarsh on 10/25/16.
  */
 public class ResponseTest {
+
+    String root = resource("/").getPath();
 
     @Test
     public void canGenerateARedirect() throws Exception {
@@ -63,6 +66,26 @@ public class ResponseTest {
         Stash response = response("success");
         header(response, "Cookie", "foo=1");
         assertEquals("foo=1", response.get("headers", Stash.class).get("Cookie"));
+    }
+
+    @Test
+    public void mightFindAFile() throws Exception {
+        assertTrue(findFileNamed(new File(root + "/lib"), "index.html").isPresent());
+        assertFalse(findFileNamed(new File(root + "/bil"), "index.html").isPresent());
+    }
+
+    @Test
+    public void canSearchForAFile() throws Exception {
+        assertTrue(findFileStartingWith(new File(root + "/lib"), "index").isPresent());
+        assertFalse(findFileStartingWith(new File(root + "/bil"), "index.html").isPresent());
+    }
+
+    @Test
+    public void canSearchForAnIndexFile() throws Exception {
+        assertTrue(findIndexFile(new File(root + "/lib")).isPresent());
+        assertTrue(findIndexFile(new File(root + "/lib2")).isPresent());
+        assertTrue(findIndexFile(new File(root + "/lib3")).isPresent());
+        assertFalse(findIndexFile(new File(root + "/bil")).isPresent());
     }
 
     @Test
