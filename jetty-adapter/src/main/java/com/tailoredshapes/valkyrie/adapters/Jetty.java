@@ -67,17 +67,21 @@ public class Jetty {
         }
 
         context.setKeyStorePassword(options.get("key-password"));
-        Object truststore = options.get("truststore");
-        if (truststore instanceof String) {
-            context.setTrustStorePath((String) truststore);
+
+        if(options.contains("truststore")){
+            Object truststore = options.get("truststore");
+            if (truststore instanceof String) {
+                context.setTrustStorePath((String) truststore);
+            }
+            if (truststore instanceof KeyStore) {
+                context.setTrustStore((KeyStore) truststore);
+            }
+            if (options.contains("trust-password")) {
+                context.setTrustStorePassword(options.get("trust-password"));
+            }
         }
-        if (truststore instanceof KeyStore) {
-            context.setTrustStore((KeyStore) truststore);
-        }
-        if (options.contains("trust-password")) {
-            context.setTrustStorePassword(options.get("trust-password"));
-        }
-        String clientAuth = options.get("client-auth");
+
+        String clientAuth = options.get("client-auth", "none");
         switch (clientAuth) {
             case "need":
                 context.setNeedClientAuth(true);

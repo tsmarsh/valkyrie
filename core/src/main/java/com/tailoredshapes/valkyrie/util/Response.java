@@ -29,25 +29,28 @@ import static java.net.URLEncoder.encode;
  * Created by tmarsh on 10/25/16.
  */
 public interface Response {
-    enum RedirectStatusCode {
+    enum StatusCode {
+        OK(200),
+        CREATED(201),
         MOVED_PERMANENTLY(301),
         FOUND(302),
         SEE_OTHER(303),
         TEMPORARY_REDIRECT(307),
-        PERMANENT_REDIRECT(308);
+        PERMANENT_REDIRECT(308),
 
+        NOT_FOUND(404);
         int code;
 
-        RedirectStatusCode(int statusCode) {
+        StatusCode(int statusCode) {
             this.code = statusCode;
         }
     }
 
     static Stash redirect(String url) {
-        return redirect(url, RedirectStatusCode.FOUND);
+        return redirect(url, StatusCode.FOUND);
     }
 
-    static Stash redirect(String url, RedirectStatusCode status) {
+    static Stash redirect(String url, StatusCode status) {
         return Stash.stash(
                 "status", status.code,
                 "headers", Stash.stash("Location", url),
@@ -57,7 +60,7 @@ public interface Response {
 
     static Stash created(String url, String body) {
         return Stash.stash(
-                "status", 201,
+                "status", StatusCode.CREATED.code,
                 "headers", Stash.stash("Location", url),
                 "body", body
         );
@@ -69,21 +72,21 @@ public interface Response {
 
     static Stash notFound(String body) {
         return Stash.stash(
-                "status", 404,
+                "status", StatusCode.NOT_FOUND.code,
                 "headers", Stash.stash(),
                 "body", body
         );
     }
     static Stash response(String body) {
         return Stash.stash(
-                "status", 200,
+                "status", StatusCode.OK.code,
                 "headers", Stash.stash(),
                 "body", body
         );
     }
 
-    static Stash status(Stash response, RedirectStatusCode status) {
-        return response.update("status", status);
+    static Stash status(Stash response, StatusCode status) {
+        return response.update("status", status.code);
     }
 
     static <T> Stash header(Stash response, String key, T value) {
