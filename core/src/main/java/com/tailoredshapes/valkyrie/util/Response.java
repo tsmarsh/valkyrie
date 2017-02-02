@@ -19,6 +19,7 @@ import java.util.zip.ZipEntry;
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.rethrow;
 import static com.tailoredshapes.underbar.IO.lastModifiedDate;
+import static com.tailoredshapes.underbar.IO.slurp;
 import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
 import static com.tailoredshapes.valkyrie.util.Time.formatDate;
@@ -77,7 +78,8 @@ public interface Response {
                 "body", body
         );
     }
-    static Stash response(String body) {
+
+    static Stash response(Object body) {
         return Stash.stash(
                 "status", StatusCode.OK.code,
                 "headers", Stash.stash(),
@@ -90,7 +92,9 @@ public interface Response {
     }
 
     static <T> Stash header(Stash response, String key, T value) {
-        return response.get("headers", Stash.class).update(key, value);
+        Stash headers = response.get("headers", stash());
+        headers.update(key, value);
+        return response;
     }
 
     static boolean isSafePath(String root, String path) {
@@ -132,7 +136,7 @@ public interface Response {
     }
 
     static File safelyFindFile(String path, Stash opts) {
-        String root = opts.get("root");
+        String root = opts.get("root", "");
         if (UnderString.hasContent(root)) {
             if ((isSafePath(root, path)) || (opts.bool("allowSymlinks?") && !isDirectoryTraversal(path))) {
                 return new File(root, path);
@@ -164,7 +168,7 @@ public interface Response {
                 "last-modified", lastModifiedDate(file));
     }
 
-    static Stash contentLength(Stash resp, int len) {
+    static Stash contentLength(Stash resp, long len) {
         return header(resp, "Content-Length", len);
     }
 
@@ -182,9 +186,8 @@ public interface Response {
             Stash data = fileData(file);
             return optional(lastModified(
                     contentLength(
-                            response(
-                                    data.get("content")),
-                            data.i("content-length")),
+                            response(data.get("content", File.class)),
+                            data.l("content-length")),
                     data.get("last-modified")));
         }
         return optional();

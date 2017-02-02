@@ -117,6 +117,15 @@ public class ResponseTest {
     }
 
     @Test
+    public void canGenerateAFileResponse() throws Exception {
+        Stash expected = stash(
+                "body", file(resource("/lib/index.html")),
+                "headers", stash("Content-Length", 3, "Last-Modified", "Sun, 29 Jan 2017 15:08:07 UTC"),
+                "status", 200);
+        assertEquals(expected, fileResponse(root + "lib/index.html").get());
+    }
+
+    @Test
     public void canSetTheContentLengthManually() throws Exception {
         Stash response = stash("headers", stash());
         contentLength(response, 5);
