@@ -124,6 +124,13 @@ public class ResponseTest {
     }
 
     @Test
+    public void canSetTheLastModifiedManually() throws Exception {
+        Stash response = stash("headers", stash());
+        lastModified(response, new Date(613162785L));
+        assertEquals(stash("headers", stash("Last-Modified", "Thu, 08 Jan 1970 02:19:22 UTC")), response);
+    }
+
+    @Test
     public void directoryTraversalTest() throws Exception {
         assertTrue(isDirectoryTraversal("../"));
         assertTrue(isDirectoryTraversal("\\.."));
