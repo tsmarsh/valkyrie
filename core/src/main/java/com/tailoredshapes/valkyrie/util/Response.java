@@ -222,7 +222,7 @@ public interface Response {
                                         .getFile()
                                         .replace('/', File.separatorChar)
                                         .replace('+', rethrow(
-                                                () -> encode("+", "UTF-8")).charAt(0)), "UTF-8")), "UTF-8");
+                                                () -> encode("+", "UTF-8")).charAt(0)), "UTF-8")));
     }
 
     static Optional<String> getHeader(Stash resp, String headerName) {
@@ -254,6 +254,7 @@ public interface Response {
     static Optional<Stash> resourceData(URL url) {
         switch (url.getProtocol().toLowerCase()) {
             case "url":
+            case "file":
                 return fileResourceData(url);
             case "jar":
                 return jarResourceData(url);
@@ -316,15 +317,15 @@ public interface Response {
         Optional<Stash> odata = resourceData(url);
         if (odata.isPresent()) {
             Stash data = odata.get();
-            String content = optionally(data.<String>optional("content"), f -> f, () -> "");
-            Integer contentLength = optionally(data.<Integer>optional("content-length"), f -> f, () -> 0);
-            Number lastModified = optionally(data.<Number>optional("last-modified"), f -> f, () -> 0);
+            Object content = data.get("content", "");
+            Long contentLength = data.get("content-length", 0L);
+            Date lastModified = data.get("last-modified", new Date());
             return optional(
                     lastModified(
                             contentLength(
                                     response(content),
                                     contentLength),
-                            new Date(lastModified.longValue())));
+                            lastModified));
 
         }
         return odata;
