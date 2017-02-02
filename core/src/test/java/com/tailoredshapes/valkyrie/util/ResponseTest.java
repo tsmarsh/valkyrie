@@ -143,6 +143,15 @@ public class ResponseTest {
     }
 
     @Test
+    public void canSetTheContentTypeManually() throws Exception {
+        Stash response = stash();
+        contentType(response, "application/json");
+        assertEquals(stash("headers", stash("Content-Type", "application/json")), response);
+        charset(response, "UTF-16");
+        assertEquals(stash("headers", stash("Content-Type", "application/json; charset=UTF-16")), response);
+    }
+
+    @Test
     public void directoryTraversalTest() throws Exception {
         assertTrue(isDirectoryTraversal("../"));
         assertTrue(isDirectoryTraversal("\\.."));

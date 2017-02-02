@@ -94,6 +94,7 @@ public interface Response {
     static <T> Stash header(Stash response, String key, T value) {
         Stash headers = response.get("headers", stash());
         headers.update(key, value);
+        response.update("headers", headers);
         return response;
     }
 
@@ -180,6 +181,16 @@ public interface Response {
         return fileResponse(filePath, Stash.stash());
     }
 
+    static Stash contentType(Stash resp, String contentType) {
+        return header(resp, "Content-Type", contentType);
+    }
+
+    static Stash charset(Stash resp, String charset) {
+        return updateHeader(resp, "Content-Type",
+                (ct) -> maybeNull(ct, c -> c, () -> "text/plain")
+                        .replace(";\\s*charset=[^;]*", "") + "; charset=" + charset);
+    }
+
     static Optional<Stash> fileResponse(String filePath, Stash opts) {
         File file = findFile(filePath, opts);
         if (file != null) {
@@ -204,24 +215,13 @@ public interface Response {
                                                 () -> encode("+", "UTF-8")).charAt(0)), "UTF-8")), "UTF-8");
     }
 
-    static Stash contentType(Stash resp, String contentType) {
-        return header(resp, "Content-Type", contentType);
-    }
-
-
     static Optional<String> getHeader(Stash resp, String headerName) {
         return ((Stash) resp.get("headers")).maybe(headerName);
     }
 
     static Stash updateHeader(Stash resp, String headerName, Function<String, String> upD) {
         Stash headers = resp.get("headers");
-        return headers.update(headerName, upD.apply(headers.get("headerName")));
-    }
-
-    static Stash charset(Stash resp, String charset) {
-        return updateHeader(resp, "Content-Type",
-                (ct) -> maybeNull(ct, c -> c, () -> "text/plain")
-                        .replace(";\\s*charset=[^;]*", "") + "; charset=" + charset);
+        return headers.update(headerName, upD.apply(headers.get(headerName)));
     }
 
     static Optional<String> getCharset(Stash resp) {
