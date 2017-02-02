@@ -12,6 +12,7 @@ import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.IO.file;
 import static com.tailoredshapes.underbar.IO.resource;
 import static com.tailoredshapes.valkyrie.util.Response.StatusCode.*;
+import static com.tailoredshapes.valkyrie.util.Time.formatDate;
 import static org.junit.Assert.*;
 import static com.tailoredshapes.valkyrie.util.Response.*;
 
@@ -118,9 +119,11 @@ public class ResponseTest {
 
     @Test
     public void canGenerateAFileResponse() throws Exception {
+        File file = file(resource("/lib/index.html"));
+
         Stash expected = stash(
-                "body", file(resource("/lib/index.html")),
-                "headers", stash("Content-Length", 3, "Last-Modified", "Sun, 29 Jan 2017 15:08:07 UTC"),
+                "body", file,
+                "headers", stash("Content-Length", 3, "Last-Modified", formatDate(new Date(file.lastModified()))),
                 "status", 200);
         assertEquals(expected, fileResponse(root + "lib/index.html").get());
     }
