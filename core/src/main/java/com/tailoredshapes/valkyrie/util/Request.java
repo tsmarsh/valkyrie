@@ -17,9 +17,9 @@ import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
 /**
  * Created by tmarsh on 11/14/16.
  */
-public class Request {
+public interface Request {
 
-    public static String requestURL(Stash request) {
+    static String requestURL(Stash request) {
 
         String url = join(
                 request.<String>get("scheme"),
@@ -35,7 +35,7 @@ public class Request {
         return url;
     }
 
-    public static Optional<String> contentType(Stash request) {
+    static Optional<String> contentType(Stash request) {
         if (request.<Stash>get("headers").contains("content-type")) {
             String type = request.<Stash>get("headers").get("content-type");
             Matcher matcher = pattern("^(.*?)(?:;|$)").matcher(type);
@@ -46,7 +46,7 @@ public class Request {
         return optional();
     }
 
-    public static Optional<String> characterEncoding(Stash request) {
+    static Optional<String> characterEncoding(Stash request) {
         if (request.contains("headers")) {
             Stash headers = request.get("headers", Stash.class);
             if (headers.contains("content-type")) {
@@ -57,13 +57,13 @@ public class Request {
         return optional();
     }
 
-    public static boolean isURLEncodedForm(Stash request) {
+    static boolean isURLEncodedForm(Stash request) {
         return optionally(contentType(request),
                 (type) -> type.startsWith("application/x-www-form-urlencoded"),
                 () -> false);
     }
 
-    public static Optional<String> bodyString(Stash request) {
+    static Optional<String> bodyString(Stash request) {
         Optional body = request.maybe("body");
 
         if (body.isPresent()) {
@@ -84,7 +84,7 @@ public class Request {
         return optional();
     }
 
-    public static Optional<String> pathInfo(Stash request) {
+    static Optional<String> pathInfo(Stash request) {
         Optional<String> pathInfo = request.maybe("path-info");
         if (pathInfo.isPresent()) return pathInfo;
         Optional<String> uri = request.maybe("uri");
@@ -92,7 +92,7 @@ public class Request {
         return optional();
     }
 
-    public static boolean hasContext(Stash request, String context){
+    static boolean hasContext(Stash request, String context){
         Optional<String> uri = request.maybe("uri");
         if(uri.isPresent()){
             return uri.get().startsWith(context);
@@ -100,7 +100,7 @@ public class Request {
         return false;
     }
 
-    public static Stash setContext(Stash request, String context){
+    static Stash setContext(Stash request, String context){
         String uri = request.get("uri");
         return request.assoc("context", context).assoc("path-info", uri.substring(context.length()));
     }
