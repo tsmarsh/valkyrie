@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 import java.util.Optional;
 
 import static com.tailoredshapes.stash.Stash.stash;
@@ -93,6 +94,25 @@ public class ResponseTest {
     public void canSafelyFindFile() throws Exception {
         File expected = file(resource("/lib/index.html"));
         File actual = safelyFindFile("lib/index.html", stash("root", this.root));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canFindIndexFile() throws Exception {
+        File expected = file(resource("/lib/index.html"));
+        File actual = findFile("lib", stash("root", this.root, "indexFiles?", true));
+        assertEquals(expected, actual);
+        actual = findFile("lib/index.html", stash("root", this.root));
+        assertEquals(expected, actual);
+        assertNull(findFile("bil", stash("root", this.root)));
+    }
+
+    @Test
+    public void canGenerateFileDate() throws Exception {
+        File file = file(resource("/lib/index.html"));
+
+        Stash expected = stash("content", file, "content-length", 3, "last-modified", new Date(file.lastModified()))
+        Stash actual = fileData(file);
         assertEquals(expected, actual);
     }
 
