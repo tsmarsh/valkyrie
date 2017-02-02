@@ -111,7 +111,7 @@ public class ResponseTest {
     public void canGenerateFileDate() throws Exception {
         File file = file(resource("/lib/index.html"));
 
-        Stash expected = stash("content", file, "content-length", 3, "last-modified", new Date(file.lastModified()))
+        Stash expected = stash("content", file, "content-length", 3, "last-modified", new Date(file.lastModified()));
         Stash actual = fileData(file);
         assertEquals(expected, actual);
     }
