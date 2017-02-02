@@ -117,6 +117,13 @@ public class ResponseTest {
     }
 
     @Test
+    public void canSetTheContentLengthManually() throws Exception {
+        Stash response = stash("headers", stash());
+        contentLength(response, 5);
+        assertEquals(stash("headers", stash("Content-Length", 5)), response);
+    }
+
+    @Test
     public void directoryTraversalTest() throws Exception {
         assertTrue(isDirectoryTraversal("../"));
         assertTrue(isDirectoryTraversal("\\.."));
