@@ -17,7 +17,7 @@ import static com.tailoredshapes.underbar.UnderBar.filter;
 import static com.tailoredshapes.underbar.UnderBar.first;
 import static com.tailoredshapes.valkyrie.util.Response.getCharset;
 
-public class StreamableResponseBody {
+public abstract class StreamableResponseBody {
 
     private static final Map<Class, RegularFunctions.TriConsumer<?, Stash, OutputStream>> impls = new HashMap<>();
 
