@@ -151,6 +151,12 @@ public class ResponseTest {
         assertEquals(stash("headers", stash("Content-Type", "application/json; charset=UTF-16")), response);
     }
 
+
+    @Test
+    public void canSetACookie() throws Exception {
+        assertEquals(stash("cookies", stash("foo", stash("value", "bar"))), setCookie(stash(), "foo", "bar"));
+    }
+
     @Test
     public void directoryTraversalTest() throws Exception {
         assertTrue(isDirectoryTraversal("../"));

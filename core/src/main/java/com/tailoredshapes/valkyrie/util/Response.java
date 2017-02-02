@@ -204,6 +204,16 @@ public interface Response {
         return optional();
     }
 
+    static Stash setCookie(Stash resp, String name, String value) {
+        return setCookie(resp, name, value, Stash.stash());
+    }
+
+    static Stash setCookie(Stash resp, String name, String value, Stash opts) {
+        Stash cookies = resp.get("cookies", stash());
+        cookies.update(name,opts.update("value", value));;
+        return resp.update("cookies", cookies);
+    }
+
     static File urlAsFile(URL u) {
         return new File(
                 rethrow(
@@ -234,14 +244,6 @@ public interface Response {
         }
 
         return optional();
-    }
-
-    static Stash setCookie(Stash resp, String name, String value) {
-        return setCookie(resp, name, value, Stash.stash());
-    }
-
-    static Stash setCookie(Stash resp, String name, String value, Stash opts) {
-        return resp.get("cookies", Stash.class).update(name, opts.update("value", value));
     }
 
     static boolean isReponse(Stash resp) {
