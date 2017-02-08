@@ -174,6 +174,6 @@ public class ResponseTest {
     public void canGenerateAResponseForAResource() throws Exception {
         File file = file(resource("/lib/index.html"));
         Stash expected = stash("body", file, "headers", stash("Content-Length", 3, "Last-Modified", formatDate(new Date(file.lastModified()))), "status", 200);
-        assertEquals(expected, resourceResponse("index.html", "/lib", this.getClass().getClassLoader()).get());
+        assertEquals(expected, resourceResponse("/lib/index.html", stash()).get());
     }
 }

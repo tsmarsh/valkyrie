@@ -19,10 +19,11 @@ import java.util.zip.ZipEntry;
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.rethrow;
 import static com.tailoredshapes.underbar.IO.lastModifiedDate;
-import static com.tailoredshapes.underbar.IO.slurp;
+import static com.tailoredshapes.underbar.IO.resource;
 import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
 import static com.tailoredshapes.valkyrie.util.Time.formatDate;
+import static com.tailoredshapes.valkyrie.util.methods.ResourceData.resourceData;
 import static java.net.URLDecoder.decode;
 import static java.net.URLEncoder.encode;
 
@@ -210,7 +211,8 @@ public interface Response {
 
     static Stash setCookie(Stash resp, String name, String value, Stash opts) {
         Stash cookies = resp.get("cookies", stash());
-        cookies.update(name,opts.update("value", value));;
+        cookies.update(name, opts.update("value", value));
+        ;
         return resp.update("cookies", cookies);
     }
 
@@ -236,7 +238,7 @@ public interface Response {
 
     static Optional<String> getCharset(Stash resp) {
         Optional<String> contentType = getHeader(resp, "Content-Type");
-        if(contentType.isPresent()){
+        if (contentType.isPresent()) {
             Matcher hasFoundCharset = reCharset.matcher(contentType.get());
             if (hasFoundCharset.matches()) {
                 return optional(hasFoundCharset.group(1));
@@ -249,46 +251,6 @@ public interface Response {
     static boolean isReponse(Stash resp) {
         return resp.maybe("status").isPresent() &&
                 resp.maybe("headers").isPresent();
-    }
-
-    static Optional<Stash> resourceData(URL url) {
-        switch (url.getProtocol().toLowerCase()) {
-            case "url":
-            case "file":
-                return fileResourceData(url);
-            case "jar":
-                return jarResourceData(url);
-            default:
-                return optional(stash(
-                        "content", "",
-                        "content-length", null, "last-modified", null));
-        }
-    }
-
-    static Optional<Stash> fileResourceData(URL url) {
-        File file = urlAsFile(url);
-        if (file.exists()) {
-            if (!file.isDirectory()) {
-                return optional(fileData(file));
-            }
-        }
-        return optional();
-    }
-
-    static Optional<Stash> jarResourceData(URL url) {
-        URLConnection conn = rethrow(() -> url.openConnection());
-
-        if (conn instanceof JarURLConnection) {
-            return isJARDirectory(
-                    (JarURLConnection) conn) ?
-                    optional(
-                            Stash.stash(
-                                    "content", rethrow(() -> conn.getInputStream()),
-                                    "content-length", connectionContentLength(conn),
-                                    "last-modified", connectionLastModified(conn))) :
-                    optional(Stash.stash());
-        }
-        return optional(Stash.stash());
     }
 
     static String addEndingSlash(String path) {
@@ -315,6 +277,7 @@ public interface Response {
 
     static Optional<Stash> urlResponse(URL url) {
         Optional<Stash> odata = resourceData(url);
+
         if (odata.isPresent()) {
             Stash data = odata.get();
             Object content = data.get("content", "");
@@ -331,15 +294,20 @@ public interface Response {
         return odata;
     }
 
-    static Optional<Stash> resourceResponse(String path, String root, ClassLoader loader) {
-        String base = (root + "/" + path)
+    static Optional<Stash> resourceResponse(String path, Stash opts) {
+        String rt = opts.get("root", "");
+        ClassLoader ld = opts.get("loader", Thread.currentThread().getContextClassLoader());
+
+        String base = (rt + "/" + path)
                 .replace("//", "/")
                 .replaceAll("^/", "");
-        URL url = loader != null ? loader.getResource(base) :
-                Object.class.getResource(base);
-        return urlResponse(url);
 
+        URL url = ld.getResource(base);
+
+        return urlResponse(url);
     }
 }
+
+
 
 
