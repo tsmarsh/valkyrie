@@ -176,4 +176,10 @@ public class ResponseTest {
         Stash expected = stash("body", file, "headers", stash("Content-Length", 3, "Last-Modified", formatDate(new Date(file.lastModified()))), "status", 200);
         assertEquals(expected, resourceResponse("/lib/index.html", stash()).get());
     }
+
+    @Test
+    public void canDetectAResponse() throws Exception {
+        assertFalse(isResponse(stash()));
+        assertTrue(isResponse(stash("status", 200, "headers", stash())));
+    }
 }

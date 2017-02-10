@@ -248,7 +248,7 @@ public interface Response {
         return optional();
     }
 
-    static boolean isReponse(Stash resp) {
+    static boolean isResponse(Stash resp) {
         return resp.maybe("status").isPresent() &&
                 resp.maybe("headers").isPresent();
     }
