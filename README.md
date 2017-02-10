@@ -34,7 +34,7 @@ A server definition is expressed as an object (a Servlet) that operates on other
 
 Ring, and now Valkrie, express them as functions (a handler) that accept data and return data. 
 
-```$java
+```java
 Function<Stash, Stash> handler = (req) -> stash(
                                                 "status", 200,
                                                 "headers", stash("Content-Type", "text/plain", 
@@ -44,7 +44,7 @@ Function<Stash, Stash> handler = (req) -> stash(
 
 We can now take that handler and turn it into a servlet:
 
-```$java
+```java
 HTTPServer servlet = servlet((req) -> stash(
                                            "status", 200,
                                            "headers", stash("Content-Type", "text/plain", 
@@ -54,7 +54,7 @@ HTTPServer servlet = servlet((req) -> stash(
 
 Which you can plug into a JEE Servlet application, or maybe you just want an embedded Jetty Server:
 
-```$java
+```java
 Server server = runJetty((req) -> stash(
                                        "status", 200,
                                        "headers", stash("Content-Type", "text/plain", 
@@ -71,11 +71,11 @@ The result is that the only thing that developers are writing is simple, re-usab
 
 ## Todo
 
-* ~Core library~
-* ~Sync Servlets~
-* ~Async Servlets~
-* ~Sync Jetty~
-* ~HTTPS Jetty~
+* ~~Core library~~
+* ~~Sync Servlets~~
+* ~~Async Servlets~~
+* ~~Sync Jetty~~
+* ~~HTTPS Jetty~~
 * Async Jetty
 * Middleware
 
