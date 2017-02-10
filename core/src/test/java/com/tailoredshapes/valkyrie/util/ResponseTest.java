@@ -129,6 +129,15 @@ public class ResponseTest {
     }
 
     @Test
+    public void canGenerateANotFoundResponse() throws Exception {
+        Stash expected = stash(
+                "body", null,
+                "headers", stash(),
+                "status", 404);
+        assertEquals(expected, notFound(null));
+    }
+
+    @Test
     public void canSetTheContentLengthManually() throws Exception {
         Stash response = stash("headers", stash());
         contentLength(response, 5);

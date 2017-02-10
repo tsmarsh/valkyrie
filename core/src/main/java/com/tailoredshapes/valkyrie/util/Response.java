@@ -60,7 +60,7 @@ public interface Response {
         );
     }
 
-    static Stash created(String url, String body) {
+    static Stash created(String url, Object body) {
         return Stash.stash(
                 "status", StatusCode.CREATED.code,
                 "headers", Stash.stash("Location", url),
@@ -72,7 +72,7 @@ public interface Response {
         return created(url, null);
     }
 
-    static Stash notFound(String body) {
+    static Stash notFound(Object body) {
         return Stash.stash(
                 "status", StatusCode.NOT_FOUND.code,
                 "headers", Stash.stash(),
