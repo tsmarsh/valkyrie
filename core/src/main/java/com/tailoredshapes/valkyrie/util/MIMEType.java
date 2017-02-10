@@ -110,7 +110,7 @@ public interface MIMEType {
         Matcher matcher = pattern("\\.([^./\\\\]+$)").matcher(filename);
         if(matcher.find()){
             String ext = matcher.group(1);
-            return ext != null ? ext.toLowerCase() : "";
+            return ext.toLowerCase();
         }
         return "";
     }
