@@ -2,19 +2,22 @@ package com.tailoredshapes.valkyrie.util;
 
 import com.tailoredshapes.stash.Stash;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
-import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
-import java.util.Optional;
 
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.IO.file;
 import static com.tailoredshapes.underbar.IO.resource;
-import static com.tailoredshapes.valkyrie.util.Response.StatusCode.*;
+import static com.tailoredshapes.underbar.UnderBar.optional;
+import static com.tailoredshapes.valkyrie.util.Response.StatusCode.MOVED_PERMANENTLY;
+import static com.tailoredshapes.valkyrie.util.Response.*;
 import static com.tailoredshapes.valkyrie.util.Time.formatDate;
 import static org.junit.Assert.*;
-import static com.tailoredshapes.valkyrie.util.Response.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by tmarsh on 10/25/16.
@@ -190,5 +193,29 @@ public class ResponseTest {
     public void canDetectAResponse() throws Exception {
         assertFalse(isResponse(stash()));
         assertTrue(isResponse(stash("status", 200, "headers", stash())));
+    }
+
+    @Test
+    public void canAddAnEndingSlash() throws Exception {
+        assertEquals("foo/", addEndingSlash("foo"));
+        assertEquals("foo/", addEndingSlash("foo/"));
+    }
+
+    @Test
+    public void canGetContentLengthOfURLConnection() throws Exception {
+        URLConnection mockConnection = mock(URLConnection.class);
+        when(mockConnection.getContentLength()).thenReturn(3);
+        assertEquals(3, (long) connectionContentLength(mockConnection).get());
+        when(mockConnection.getContentLength()).thenReturn(-1);
+        assertEquals(optional(), connectionContentLength(mockConnection));
+    }
+
+    @Test
+    public void canGetContentLastModifiedOfURLConnection() throws Exception {
+        URLConnection mockConnection = mock(URLConnection.class);
+        when(mockConnection.getLastModified()).thenReturn(3L);
+        assertEquals(3L, (long) connectionLastModified(mockConnection).get());
+        when(mockConnection.getLastModified()).thenReturn(0L);
+        assertEquals(optional(), Response.connectionLastModified(mockConnection));
     }
 }
