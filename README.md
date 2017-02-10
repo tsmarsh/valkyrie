@@ -32,7 +32,7 @@ This has meant that most Java developers use objects for everything. EVERYTHING.
 
 A server definition is expressed as an object (a Servlet) that operates on other objects (a Request and a Response) by passing them other objects (often Strings and Streams). 
 
-Ring, and now Valkrie, express them as functions (a handler) that accept data and return data. 
+Ring, and now Valkyrie, express them as functions (a handler) that accept data and return data. 
 
 ```java
 Function<Stash, Stash> handler = (req) -> stash(
