@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/tsmarsh/valkyrie/branch/master/graph/badge.svg)](https://codecov.io/gh/tsmarsh/valkyrie)
 
 
-A Java 8 port of Clojure's Ring that uses UnderBar for much skookum.
+A Java 8 port of Clojure's [Ring](https://github.com/ring-clojure/ring) that uses [UnderBar](https://github.com/tsmarsh/UnderBar) for much skookum.
 
 So what is this all about? Clojure, like all good lisps recognises the 3 types of closures:
 
