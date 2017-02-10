@@ -14,7 +14,7 @@ So what is this all about? Clojure, like all good lisps recognises the 3 types o
 
 The more of your problem you can express as data, rather than functions, the easier your life gets. 
 Data doesn't go wrong. 
-It can be wrong, it can be incorrectly manipulated, but none of that is the data's fault. You can test teh structure of the data, but there is no logic to test.
+It can be wrong, it can be incorrectly manipulated, but none of that is the data's fault. You can test the structure of the data, but there is no logic to test.
 
 
 Functions, at least in the small, are easier to understand. 
@@ -36,30 +36,30 @@ Ring, and now Valkrie, express them as functions (a handler) that accept data an
 
 ```$java
 Function<Stash, Stash> handler = (req) -> stash(
-                                                                                        "status", 200,
-                                                                                        "headers", stash("Content-Type", "text/plain", 
-                                                                                                         "Cookie", list("foo=5", "moo=cow")),
-                                                                                        "body", file(resource("/hello.txt")));
+                                                "status", 200,
+                                                "headers", stash("Content-Type", "text/plain", 
+                                                                 "Cookie", list("foo=5", "moo=cow")),
+                                                "body", file(resource("/hello.txt")));
 ```
 
 We can now take that handler and turn it into a servlet:
 
 ```$java
 HTTPServer servlet = servlet((req) -> stash(
-                                                                               "status", 200,
-                                                                               "headers", stash("Content-Type", "text/plain", 
-                                                                                                "Cookie", list("foo=5", "moo=cow")),
-                                                                               "body", file(resource("/hello.txt")));
+                                           "status", 200,
+                                           "headers", stash("Content-Type", "text/plain", 
+                                                            "Cookie", list("foo=5", "moo=cow")),
+                                           "body", file(resource("/hello.txt")));
 ```
 
 Which you can plug into a JEE Servlet application, or maybe you just want an embedded Jetty Server:
 
 ```$java
 Server server = runJetty((req) -> stash(
-                                                                               "status", 200,
-                                                                               "headers", stash("Content-Type", "text/plain", 
-                                                                                                "Cookie", list("foo=5", "moo=cow")),
-                                                                               "body", file(resource("/hello.txt")));
+                                       "status", 200,
+                                       "headers", stash("Content-Type", "text/plain", 
+                                                        "Cookie", list("foo=5", "moo=cow")),
+                                       "body", file(resource("/hello.txt")));
 
 server.start();
 ```
