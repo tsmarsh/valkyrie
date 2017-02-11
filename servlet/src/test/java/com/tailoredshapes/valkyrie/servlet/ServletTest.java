@@ -130,7 +130,7 @@ public class ServletTest {
 
     @Test
     public void shouldCreateAServletFromAnAsyncHandlerThatFails() throws Exception {
-        HttpServlet servlet = servlet((request, onSuccess, onError) -> onError.accept(new RuntimeException("failure")));
+        HttpServlet servlet = servlet((request, onSuccess, onError) -> onError.apply(new RuntimeException("failure")));
 
         context.addServlet(new ServletHolder(servlet), "/*");
 

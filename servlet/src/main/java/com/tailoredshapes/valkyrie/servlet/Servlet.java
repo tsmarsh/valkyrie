@@ -1,6 +1,8 @@
 package com.tailoredshapes.valkyrie.servlet;
 
 import com.tailoredshapes.stash.Stash;
+import com.tailoredshapes.valkyrie.middleware.AsyncHandler;
+import com.tailoredshapes.valkyrie.middleware.Handler;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -14,6 +16,7 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.tailoredshapes.stash.Stash.stash;
@@ -110,11 +113,11 @@ public interface Servlet {
         }
     }
 
-    static HttpServletResponse updateServletResponse(HttpServletResponse response, Stash responseMap) {
+    static Stash updateServletResponse(HttpServletResponse response, Stash responseMap) {
         return updateServletResponse(response, null, responseMap);
     }
 
-    static HttpServletResponse updateServletResponse(HttpServletResponse response, AsyncContext context, Stash responseMap) {
+    static Stash updateServletResponse(HttpServletResponse response, AsyncContext context, Stash responseMap) {
         assert (responseMap != null);
         assert (response != null);
 
@@ -128,7 +131,7 @@ public interface Servlet {
 
         writeBodyToStream(body, responseMap, os);
 
-        return response;
+        return responseMap;
     }
 
     static ServiceMethod makeServiceMethod(Function<Stash, Stash> handler) {
@@ -144,19 +147,18 @@ public interface Servlet {
         return (servlet, request, response) -> {
             AsyncContext context = request.startAsync();
 
-            Stash requestMap = mergeServletKeys(
-                    buildRequestMap(request),
-                    servlet,
-                    request,
-                    response);
-
-            handler.accept(
-                    requestMap,
-                    (respMap) -> updateServletResponse(response, context, respMap),
-                    (e) -> rethrow(() -> {
-                        response.sendError(500, e.getMessage());
-                        context.complete();
-                    }));
+            handler.apply(
+                    mergeServletKeys(
+                            buildRequestMap(request),
+                            servlet,
+                            request,
+                            response),
+                    (Stash respMap) -> updateServletResponse(response, context, respMap),
+                    (Throwable e) -> rethrow(() -> {
+                                response.sendError(500, e.getMessage());
+                                context.complete();
+                                return stash();
+                            }));
         };
     }
 
