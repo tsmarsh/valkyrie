@@ -10,9 +10,14 @@ import static com.tailoredshapes.valkyrie.util.MIMEType.extMimeType;
 import static com.tailoredshapes.valkyrie.util.Response.contentType;
 import static com.tailoredshapes.valkyrie.util.Response.getHeader;
 
-;
 
+/**
+ * "Middleware for automatically adding a content type to response maps."
+ */
 public interface ContentType {
+    /**
+     * "Adds a content-type header to response. See: wrap-content-type."
+     */
     static Stash contentTypeResponse(Stash res, Stash req){
         return contentTypeResponse(res, req, stash());
     }
@@ -24,6 +29,16 @@ public interface ContentType {
 
     }
 
+    /**
+     * Middleware that adds a content-type header to the response if one is not
+     set by the handler. Uses the ring.util.mime-type/ext-mime-type function to
+     guess the content-type from the file extension in the URI. If no
+     content-type can be found, it defaults to 'application/octet-stream'.
+     Accepts the following options:
+     :mime-types - a map of filename extensions to mime-types that will be
+     used in addition to the ones defined in
+     ring.util.mime-types/default-mime-types
+     */
     static Handler wrapContentType(Handler handler){
         return wrapContentType(handler, stash());
     }
