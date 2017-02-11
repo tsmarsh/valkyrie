@@ -1,8 +1,8 @@
 package com.tailoredshapes.valkyrie.middleware;
 
 import com.tailoredshapes.stash.Stash;
-
-import java.util.function.Function;
+import com.tailoredshapes.valkyrie.core.AsyncHandler;
+import com.tailoredshapes.valkyrie.core.Handler;
 
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.UnderBar.hash;

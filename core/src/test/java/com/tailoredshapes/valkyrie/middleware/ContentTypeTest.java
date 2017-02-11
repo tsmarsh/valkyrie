@@ -1,6 +1,8 @@
 package com.tailoredshapes.valkyrie.middleware;
 
 import com.tailoredshapes.stash.Stash;
+import com.tailoredshapes.valkyrie.core.AsyncHandler;
+import com.tailoredshapes.valkyrie.core.Handler;
 import org.junit.Test;
 
 import static com.tailoredshapes.stash.Stash.stash;

@@ -1,4 +1,4 @@
-package com.tailoredshapes.valkyrie.middleware;
+package com.tailoredshapes.valkyrie.core;
 
 import com.tailoredshapes.stash.Stash;
 

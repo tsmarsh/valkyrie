@@ -1,8 +1,7 @@
 package com.tailoredshapes.valkyrie.servlet;
 
 import com.tailoredshapes.stash.Stash;
-import com.tailoredshapes.valkyrie.middleware.AsyncHandler;
-import com.tailoredshapes.valkyrie.middleware.Handler;
+import com.tailoredshapes.valkyrie.core.AsyncHandler;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -16,7 +15,6 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.tailoredshapes.stash.Stash.stash;
