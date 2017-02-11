@@ -1,11 +1,9 @@
 package com.tailoredshapes.valkyrie.servlet;
 
 import com.tailoredshapes.stash.Stash;
-import com.tailoredshapes.underbar.function.RegularFunctions;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +14,6 @@ import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.tailoredshapes.stash.Stash.stash;
@@ -134,7 +131,7 @@ public interface Servlet {
         return response;
     }
 
-    static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(Function<Stash, Stash> handler) {
+    static ServiceMethod makeServiceMethod(Function<Stash, Stash> handler) {
         return (servlet, request, response) -> {
             Stash requestMap = buildRequestMap(request);
             requestMap = mergeServletKeys(requestMap, servlet, request, response);
@@ -143,7 +140,7 @@ public interface Servlet {
         };
     }
 
-    static RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> makeServiceMethod(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
+    static ServiceMethod makeServiceMethod(AsyncHandler handler) {
         return (servlet, request, response) -> {
             AsyncContext context = request.startAsync();
 
@@ -164,7 +161,7 @@ public interface Servlet {
     }
 
     static HttpServlet servlet(Function<Stash, Stash> handler) {
-        RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> serviceMethod = makeServiceMethod(handler);
+        ServiceMethod serviceMethod = makeServiceMethod(handler);
         return new HttpServlet() {
             @Override
             protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -173,8 +170,8 @@ public interface Servlet {
         };
     }
 
-    static HttpServlet servlet(RegularFunctions.TriConsumer<Stash, Function<Stash, HttpServletResponse>, Consumer<Throwable>> handler) {
-        RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> serviceMethod = makeServiceMethod(handler);
+    static HttpServlet servlet(AsyncHandler handler) {
+        ServiceMethod serviceMethod = makeServiceMethod(handler);
         return new HttpServlet() {
             @Override
             protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
