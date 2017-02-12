@@ -1,0 +1,18 @@
+package com.tailoredshapes.valkyrie.middleware;
+
+import org.junit.Test;
+
+import static com.tailoredshapes.stash.Stash.stash;
+import static com.tailoredshapes.valkyrie.middleware.Cookies.parseCookieHeader;
+import static org.junit.Assert.*;
+
+public class CookiesTest {
+    @Test
+    public void parseCookieHeaderTest() throws Exception {
+        assertEquals(stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c",
+                "foo_lastvisit", "1486867396",
+                "foo_lastactivity", "0"),
+                parseCookieHeader("foo_1=2181b33d2ed3d8bfb292171d3055ad0c; foo_lastvisit=1486867396; foo_lastactivity=0"));
+    }
+
+}
