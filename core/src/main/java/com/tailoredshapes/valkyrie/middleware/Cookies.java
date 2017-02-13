@@ -7,15 +7,16 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.UnderBar.hash;
-import static com.tailoredshapes.underbar.UnderBar.list;
+import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.underbar.UnderReg.groups;
 import static com.tailoredshapes.underbar.UnderReg.pattern;
 import static com.tailoredshapes.valkyrie.util.Parsing.reToken;
+import static com.tailoredshapes.valkyrie.util.Request.getHeader;
 
 public interface Cookies {
 
@@ -54,5 +55,27 @@ public interface Cookies {
             cookies.put(matcher.group(1), matcher.group(2));
         }
         return new Stash(cookies);
+    }
+
+    static String stripQuotes(String value){
+       return value.replaceAll("^\"|\"$", "");
+    }
+
+    static <T> Stash decodeValues(Stash cookies, Function<String, T> decoder){
+        return new Stash(
+                mapFromEntry(
+                        cookies.map(
+                                (name, value) -> entry(name, decoder.apply(stripQuotes((String) value)))),
+                        (i) -> i));
+    }
+
+    static <T> Stash parseCookies(Stash request, Function<String, T> encoder){
+        String cookie = getHeader(request, "cookie");
+        if(cookie != null){
+            Stash cookies = parseCookieHeader(cookie);
+            return decodeValues(cookies, encoder);
+        }
+
+        return stash();
     }
 }

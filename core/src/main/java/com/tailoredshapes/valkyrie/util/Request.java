@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.IO.slurp;
 import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.underbar.UnderReg.*;
@@ -103,5 +104,10 @@ public interface Request {
     static Stash setContext(Stash request, String context){
         String uri = request.get("uri");
         return request.assoc("context", context).assoc("path-info", uri.substring(context.length()));
+    }
+
+    static <T> T getHeader(Stash request, String name) {
+        Stash headers = request.get("headers", stash());
+        return headers.contains(name) ? headers.get(name) : null;
     }
 }
