@@ -89,7 +89,7 @@ public interface Cookies {
         return stash();
     }
 
-    static String writeValue(String key, Object value, Function<Stash, String> encoder){
+    static String writeValue(String key, Object value, Function<Object, String> encoder){
         return encoder.apply(stash(key, value));
     }
 
@@ -134,7 +134,7 @@ public interface Cookies {
         return join(attrStrings);
     }
 
-    static List<String> writeCookies(Stash cookies, Function<Stash, String> encoder){
+    static List<String> writeCookies(Stash cookies, Function<Object, String> encoder){
         return cookies.map((k, v) -> {
             if(v instanceof Stash){
                 return writeValue(k, v, encoder) + writeAttrMap((Stash)v);
@@ -144,7 +144,7 @@ public interface Cookies {
         });
     }
 
-    static Stash setCookies(Stash response, Function<Stash, String> encoder){
+    static Stash setCookies(Stash response, Function<Object, String> encoder){
         if(response.contains("cookies")){
             Stash headers = response.get("headers");
             headers.update("Set-Cookie", join(writeCookies(response.get("cookies"), encoder)));
@@ -167,4 +167,22 @@ public interface Cookies {
             return request.update("cookies", parseCookies(request, encoder));
         }
     }
+
+    /**
+     *   For responses with :cookies, adds Set
+     *   without :cookies. See: wrap-cookies.
+     * @param response
+     * @return
+     */
+    static Stash cookiesResponse(Stash response){
+        return cookiesResponse(response, stash());
+    }
+
+    static Stash cookiesResponse(Stash response, Stash options){
+        Function<Object, String> encoder = options.get("encoder", Codec::formEncode);
+        setCookies(response, encoder);
+        response.remove("cookies");
+        return response;
+    }
+
 }

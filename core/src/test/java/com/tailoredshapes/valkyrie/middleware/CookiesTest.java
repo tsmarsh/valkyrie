@@ -3,9 +3,7 @@ package com.tailoredshapes.valkyrie.middleware;
 import org.junit.Test;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.valkyrie.middleware.Cookies.cookiesRequest;
-import static com.tailoredshapes.valkyrie.middleware.Cookies.parseCookieHeader;
-import static com.tailoredshapes.valkyrie.middleware.Cookies.parseCookies;
+import static com.tailoredshapes.valkyrie.middleware.Cookies.*;
 import static org.junit.Assert.assertEquals;
 
 public class CookiesTest {
@@ -38,5 +36,14 @@ public class CookiesTest {
         assertEquals(stash("cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c")),
 
                 cookiesRequest(stash("cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c"))));
+    }
+
+    @Test
+    public void shouldSetCookieHeaderOnResponse() throws Exception {
+        assertEquals(stash(
+                "headers", stash("Set-Cookie", "foo_1=2181b33d2ed3d8bfb292171d3055ad0c")),
+                cookiesResponse(stash(
+                "headers", stash(),
+                "cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c"))));
     }
 }
