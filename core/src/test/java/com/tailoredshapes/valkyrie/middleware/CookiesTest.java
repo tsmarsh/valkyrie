@@ -32,4 +32,11 @@ public class CookiesTest {
                 "cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c")),
                 cookiesRequest(stash("headers", stash("cookie", "foo_1=2181b33d2ed3d8bfb292171d3055ad0c"))));
     }
+
+    @Test
+    public void shouldDoNothingIfCookiesAlreadyExist() throws Exception {
+        assertEquals(stash("cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c")),
+
+                cookiesRequest(stash("cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c"))));
+    }
 }
