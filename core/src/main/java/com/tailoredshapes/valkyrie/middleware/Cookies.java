@@ -1,6 +1,8 @@
 package com.tailoredshapes.valkyrie.middleware;
 
 import com.tailoredshapes.stash.Stash;
+import com.tailoredshapes.valkyrie.core.AsyncHandler;
+import com.tailoredshapes.valkyrie.core.Handler;
 import com.tailoredshapes.valkyrie.util.Codec;
 
 import java.text.DateFormat;
@@ -185,4 +187,42 @@ public interface Cookies {
         return response;
     }
 
+    /**
+     *
+     * Parses the cookies in the request map, then assocs the resulting map
+     * to the :cookies key on the quest.
+     * Accepts the following options:
+     *   "decoder" - a function to decode the cookie value. Expects a function that
+     *   takes a string and returns a string. Defaults to URL-decodig.
+     *   "encoder" - a function to encode the cookie name and value. Expects a
+     *   function that takes a name/value map and returns a string
+     *
+     *   Defaults to URL-encoding.
+     *   Each cookie is represented as a stash. A cookie may optionally contain
+     *   a "path", "domain" or "portattribute".
+     */
+    static Handler wrapCookies(Handler handler){
+        return wrapCookies(handler, stash());
+    }
+
+    static Handler wrapCookies(Handler handler, Stash options){
+        return (req) -> {
+            Stash cookieReq = cookiesRequest(req, options);
+            handler.apply(cookieReq);
+            cookiesResponse(cookieReq, options);
+        };
+    }
+
+    static AsyncHandler wrapCookies(AsyncHandler handler) {
+        return wrapCookies(handler, stash());
+    }
+
+    static AsyncHandler wrapCookies(AsyncHandler handler, Stash options){
+        return (request, respond, raise) ->
+                handler.apply(
+                        cookiesRequest(request, options),
+                        (response) ->
+                                respond.apply(cookiesResponse(response, options)),
+                        raise);
+    }
 }
