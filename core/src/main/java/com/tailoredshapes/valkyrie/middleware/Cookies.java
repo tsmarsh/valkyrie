@@ -1,6 +1,7 @@
 package com.tailoredshapes.valkyrie.middleware;
 
 import com.tailoredshapes.stash.Stash;
+import com.tailoredshapes.valkyrie.util.Codec;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,7 @@ import static com.tailoredshapes.underbar.UnderBar.*;
 import static com.tailoredshapes.underbar.UnderReg.groups;
 import static com.tailoredshapes.underbar.UnderReg.pattern;
 import static com.tailoredshapes.underbar.UnderString.join;
+import static com.tailoredshapes.valkyrie.util.Codec.formEncode;
 import static com.tailoredshapes.valkyrie.util.Parsing.reToken;
 import static com.tailoredshapes.valkyrie.util.Parsing.value;
 import static com.tailoredshapes.valkyrie.util.Request.getHeader;
@@ -69,15 +71,15 @@ public interface Cookies {
        return value.replaceAll("^\"|\"$", "");
     }
 
-    static <T> Stash decodeValues(Stash cookies, Function<String, T> decoder){
+    static <T> Stash decodeValues(Stash cookies, BiFunction<String, String[], T> decoder){
         return new Stash(
                 mapFromEntry(
                         cookies.map(
-                                (name, value) -> entry(name, decoder.apply(stripQuotes((String) value)))),
+                                (name, value) -> entry(name, decoder.apply(stripQuotes((String) value), array()))),
                         (i) -> i));
     }
 
-    static <T> Stash parseCookies(Stash request, Function<String, T> encoder){
+    static <T> Stash parseCookies(Stash request, BiFunction<String, String[], T> encoder){
         String cookie = getHeader(request, "cookie");
         if(cookie != null){
             Stash cookies = parseCookieHeader(cookie);
@@ -150,11 +152,19 @@ public interface Cookies {
         return response;
     }
 
+    /**
+     * Parses cookies in the request map. See: wrap-cookies.
+     */
     static Stash cookiesRequest(Stash request){
         return cookiesRequest(request, stash());
     }
 
     static Stash cookiesRequest(Stash request, Stash options){
-        options.get("decoder", )
+        BiFunction<String, String[], String> encoder = options.get("encoder", Codec::formDecodeString);
+        if(request.contains("cookies")){
+            return request;
+        } else {
+            return request.update("cookies", parseCookies(request, encoder));
+        }
     }
 }
