@@ -1,9 +1,12 @@
 package com.tailoredshapes.valkyrie.middleware;
 
 import com.tailoredshapes.stash.Stash;
+import com.tailoredshapes.underbar.Dates;
 import com.tailoredshapes.valkyrie.core.AsyncHandler;
 import com.tailoredshapes.valkyrie.core.Handler;
 import org.junit.Test;
+
+import java.util.Date;
 
 import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.die;
@@ -49,6 +52,15 @@ public class CookiesTest {
                 cookiesResponse(stash(
                 "headers", stash(),
                 "cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c"))));
+    }
+
+    @Test
+    public void shouldSetStashCookieHeaderOnResponse() throws Exception {
+        assertEquals(stash(
+                "headers", stash("Set-Cookie", "foo_1=eggs=4;Expires=2011-30-348T08:30:00-0500;Max-Age=5;Secure")),
+                cookiesResponse(stash(
+                        "headers", stash(),
+                        "cookies", stash("foo_1", stash("max-age", 5L, "expires", Dates.date("2011-12-14T13:30:00Z"), "secure", true, "value", stash("eggs", 4))))));
     }
 
     @Test

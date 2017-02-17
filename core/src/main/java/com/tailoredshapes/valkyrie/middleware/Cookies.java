@@ -129,7 +129,7 @@ public interface Cookies {
             }else if (v instanceof Boolean){
                 return (Boolean)v ? ";" + attr : "";
             } else {
-                return ";" + attr + "=" + value;
+                return ";" + attr + "=" + v;
             }
         });
 
@@ -139,7 +139,7 @@ public interface Cookies {
     static List<String> writeCookies(Stash cookies, Function<Object, String> encoder){
         return cookies.map((k, v) -> {
             if(v instanceof Stash){
-                return writeValue(k, v, encoder) + writeAttrMap((Stash)v);
+                return writeValue(k, ((Stash)v).get("value"), encoder) + writeAttrMap(((Stash)v).dissoc("value"));
             } else {
                 return writeValue(k, v, encoder);
             }
