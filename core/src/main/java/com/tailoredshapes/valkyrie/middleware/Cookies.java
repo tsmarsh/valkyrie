@@ -57,7 +57,7 @@ public interface Cookies {
             "lax", "Lax"
     );
 
-    DateFormat rfc822Formatter =new SimpleDateFormat("yyyy-mm-DD'T'hh:mm:ssZ", Locale.US);
+    DateFormat rfc822Formatter =new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssZ", Locale.US);
 
     static Stash parseCookieHeader(String header) {
         Matcher matcher = cookie.matcher(header);

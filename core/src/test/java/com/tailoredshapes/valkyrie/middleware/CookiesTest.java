@@ -12,6 +12,7 @@ import static com.tailoredshapes.stash.Stash.stash;
 import static com.tailoredshapes.underbar.Die.die;
 import static com.tailoredshapes.valkyrie.middleware.Cookies.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CookiesTest {
     @Test
@@ -56,11 +57,16 @@ public class CookiesTest {
 
     @Test
     public void shouldSetStashCookieHeaderOnResponse() throws Exception {
-        assertEquals(stash(
-                "headers", stash("Set-Cookie", "foo_1=eggs=4;Expires=2011-30-348T08:30:00-0500;Max-Age=5;Secure")),
-                cookiesResponse(stash(
-                        "headers", stash(),
-                        "cookies", stash("foo_1", stash("max-age", 5L, "expires", Dates.date("2011-12-14T13:30:00Z"), "secure", true, "value", stash("eggs", 4))))));
+        Stash actual = cookiesResponse(stash(
+                "headers", stash(),
+                "cookies", stash("foo_1", stash("max-age", 5L, "expires", Dates.date("2011-12-14T13:30:00Z"), "secure", true, "value", stash("eggs", 4)))));
+
+        String setCookie = actual.get("headers", Stash.class).get("Set-Cookie");
+        
+        assertTrue(setCookie.contains("foo_1=eggs=4"));
+        assertTrue(setCookie.contains("Expires=2011-12-14"));
+        assertTrue(setCookie.contains("Max-Age=5"));
+        assertTrue(setCookie.contains("Secure"));
     }
 
     @Test
