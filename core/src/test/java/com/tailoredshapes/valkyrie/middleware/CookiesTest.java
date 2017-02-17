@@ -1,8 +1,12 @@
 package com.tailoredshapes.valkyrie.middleware;
 
+import com.tailoredshapes.stash.Stash;
+import com.tailoredshapes.valkyrie.core.AsyncHandler;
+import com.tailoredshapes.valkyrie.core.Handler;
 import org.junit.Test;
 
 import static com.tailoredshapes.stash.Stash.stash;
+import static com.tailoredshapes.underbar.Die.die;
 import static com.tailoredshapes.valkyrie.middleware.Cookies.*;
 import static org.junit.Assert.assertEquals;
 
@@ -47,5 +51,33 @@ public class CookiesTest {
                 "cookies", stash("foo_1", "2181b33d2ed3d8bfb292171d3055ad0c"))));
     }
 
+    @Test
+    public void wrapsAHandleWithCookies() throws Exception {
+        Handler handler = wrapCookies((req) -> {
+            Stash cookies = req.get("cookies");
+            assertEquals(stash("foo", "bar"), cookies);
 
+            return stash("headers", stash(), "cookies", stash("eggs", "spam"));
+        });
+
+        Stash actual = handler.apply(stash(
+                "headers", stash("cookie", "foo=bar")));
+
+        assertEquals(stash("headers", stash("Set-Cookie", "eggs=spam")), actual);
+    }
+
+    @Test
+    public void wrapsAnAsyncHandlerWithCookies() throws Exception {
+        AsyncHandler asyncHandler = wrapCookies((req, res, raise) -> {
+            Stash cookies = req.get("cookies");
+            assertEquals(stash("foo", "bar"), cookies);
+
+            return res.apply(stash("headers", stash(), "cookies", stash("eggs", "spam")));
+        });
+
+        Stash actual = asyncHandler.apply(stash(
+                "headers", stash("cookie", "foo=bar")), r -> r, (c) -> die(c, "Failed in test"));
+
+        assertEquals(stash("headers", stash("Set-Cookie", "eggs=spam")), actual);
+    }
 }

@@ -208,8 +208,8 @@ public interface Cookies {
     static Handler wrapCookies(Handler handler, Stash options){
         return (req) -> {
             Stash cookieReq = cookiesRequest(req, options);
-            handler.apply(cookieReq);
-            cookiesResponse(cookieReq, options);
+            Stash response = handler.apply(cookieReq);
+            return cookiesResponse(response, options);
         };
     }
 
@@ -218,11 +218,13 @@ public interface Cookies {
     }
 
     static AsyncHandler wrapCookies(AsyncHandler handler, Stash options){
-        return (request, respond, raise) ->
-                handler.apply(
-                        cookiesRequest(request, options),
-                        (response) ->
-                                respond.apply(cookiesResponse(response, options)),
-                        raise);
+        return (request, respond, raise) -> {
+            Stash cookiesRequest = cookiesRequest(request, options);
+            return handler.apply(
+                    cookiesRequest,
+                    (response) ->
+                            respond.apply(cookiesResponse(response, options)),
+                    raise);
+        };
     }
 }
