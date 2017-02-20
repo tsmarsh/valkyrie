@@ -7,7 +7,9 @@
     <version>0.0.3-SNAPSHOT</version>
     <name>Valkyrie</name>
     <url>https://github.com/tsmarsh/valkyrie</url>
-
+    <description>
+      A Java 8 port of Clojure's Ring that uses UnderBar for much skookum.
+    </description>
     <developers>
         <developer>
             <id>tsmarsh</id>
