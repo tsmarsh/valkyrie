@@ -3,13 +3,13 @@
     <parent>
         <artifactId>valkyrie</artifactId>
         <groupId>com.tailoredshapes</groupId>
-        <version>0.0.2</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tailoredshapes.valkyrie</groupId>
     <artifactId>servlet</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>com.tailoredshapes.valkyrie</groupId>
             <artifactId>core</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
