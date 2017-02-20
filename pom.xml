@@ -4,7 +4,7 @@
 
     <groupId>com.tailoredshapes</groupId>
     <artifactId>valkyrie</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5-SNAPSHOT</version>
     <name>Valkyrie</name>
     <url>https://github.com/tsmarsh/valkyrie</url>
     <description>
@@ -35,7 +35,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:tsmarsh/valkyrie.git</developerConnection>
-        <tag>valkyrie-0.0.4</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/tsmarsh/valkyrie</url>
     </scm>
 
