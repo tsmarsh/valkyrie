@@ -2,9 +2,9 @@ package com.tailoredshapes.valkyrie.util;
 
 import org.junit.Test;
 
-import static com.tailoredshapes.underbar.UnderBar.hash;
+import static com.tailoredshapes.underbar.ocho.UnderBar.hash;
 import static com.tailoredshapes.valkyrie.util.MIMEType.extMimeType;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by tmarsh on 2/9/17.

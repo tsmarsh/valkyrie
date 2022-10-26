@@ -10,10 +10,10 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static com.tailoredshapes.underbar.Die.dieIfEmpty;
-import static com.tailoredshapes.underbar.Die.rethrow;
-import static com.tailoredshapes.underbar.UnderBar.*;
-import static com.tailoredshapes.underbar.UnderString.join;
+import static com.tailoredshapes.underbar.ocho.Die.dieIfEmpty;
+import static com.tailoredshapes.underbar.ocho.Die.rethrow;
+import static com.tailoredshapes.underbar.ocho.UnderBar.*;
+import static com.tailoredshapes.underbar.ocho.UnderString.join;
 
 public abstract class FormEncodeable {
 

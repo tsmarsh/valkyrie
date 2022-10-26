@@ -1,9 +1,9 @@
 package com.tailoredshapes.valkyrie.servlet;
 
-import com.tailoredshapes.underbar.function.RegularFunctions.TriConsumer;
+import com.tailoredshapes.underbar.ocho.function.RegularFunctions;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-public interface ServiceMethod extends TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse>{}
+public interface ServiceMethod extends RegularFunctions.TriConsumer<HttpServlet, HttpServletRequest, HttpServletResponse> {}

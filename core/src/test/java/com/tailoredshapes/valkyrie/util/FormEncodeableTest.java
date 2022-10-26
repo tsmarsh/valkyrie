@@ -6,10 +6,10 @@ import org.junit.Test;
 import java.util.Map;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.UnderBar.hash;
-import static com.tailoredshapes.underbar.UnderBar.list;
+import static com.tailoredshapes.underbar.ocho.UnderBar.hash;
+import static com.tailoredshapes.underbar.ocho.UnderBar.list;
 import static com.tailoredshapes.valkyrie.util.FormEncodeable.formEncode;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by tmarsh on 2/15/17.

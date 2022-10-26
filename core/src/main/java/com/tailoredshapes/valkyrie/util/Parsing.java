@@ -2,7 +2,7 @@ package com.tailoredshapes.valkyrie.util;
 
 import java.util.regex.Pattern;
 
-import static com.tailoredshapes.underbar.UnderReg.pattern;
+import static com.tailoredshapes.underbar.ocho.UnderReg.pattern;
 
 public interface Parsing {
     String token = "[!#$%&'*\\-+.0-9A-Z\\^_`a-z\\|~]+";

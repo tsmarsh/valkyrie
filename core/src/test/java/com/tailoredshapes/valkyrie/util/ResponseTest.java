@@ -2,16 +2,14 @@ package com.tailoredshapes.valkyrie.util;
 
 import com.tailoredshapes.stash.Stash;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.net.URLConnection;
 import java.util.Date;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.IO.file;
-import static com.tailoredshapes.underbar.IO.resource;
-import static com.tailoredshapes.underbar.UnderBar.optional;
+import static com.tailoredshapes.underbar.io.IO.file;
+import static com.tailoredshapes.underbar.ocho.UnderBar.optional;
 import static com.tailoredshapes.valkyrie.util.Response.StatusCode.MOVED_PERMANENTLY;
 import static com.tailoredshapes.valkyrie.util.Response.*;
 import static com.tailoredshapes.valkyrie.util.Time.formatDate;
@@ -24,7 +22,7 @@ import static org.mockito.Mockito.when;
  */
 public class ResponseTest {
 
-    String root = resource("/").getPath();
+    String root = this.getClass().getResource("/").getPath();
 
     @Test
     public void canGenerateARedirect() throws Exception {
@@ -96,14 +94,14 @@ public class ResponseTest {
 
     @Test
     public void canSafelyFindFile() throws Exception {
-        File expected = file(resource("/lib/index.html"));
+        File expected = file(this.getClass().getResource("/lib/index.html"));
         File actual = safelyFindFile("lib/index.html", stash("root", this.root));
         assertEquals(expected, actual);
     }
 
     @Test
     public void canFindIndexFile() throws Exception {
-        File expected = file(resource("/lib/index.html"));
+        File expected = file(this.getClass().getResource("/lib/index.html"));
         File actual = findFile("lib", stash("root", this.root, "indexFiles?", true));
         assertEquals(expected, actual);
         actual = findFile("lib/index.html", stash("root", this.root));
@@ -113,16 +111,16 @@ public class ResponseTest {
 
     @Test
     public void canGenerateFileDate() throws Exception {
-        File file = file(resource("/lib/index.html"));
-
-        Stash expected = stash("content", file, "content-length", 3, "last-modified", new Date(file.lastModified()));
+        File file = file(this.getClass().getResource("/lib/index.html"));
+        long date = file.lastModified() / 1000;
+        Stash expected = stash("content", file, "content-length", 3, "last-modified", new Date(date * 1000));
         Stash actual = fileData(file);
         assertEquals(expected, actual);
     }
 
     @Test
     public void canGenerateAFileResponse() throws Exception {
-        File file = file(resource("/lib/index.html"));
+        File file = file(this.getClass().getResource("/lib/index.html"));
 
         Stash expected = stash(
                 "body", file,
@@ -184,7 +182,7 @@ public class ResponseTest {
 
     @Test
     public void canGenerateAResponseForAResource() throws Exception {
-        File file = file(resource("/lib/index.html"));
+        File file = file(this.getClass().getResource("/lib/index.html"));
         Stash expected = stash("body", file, "headers", stash("Content-Length", 3, "Last-Modified", formatDate(new Date(file.lastModified()))), "status", 200);
         assertEquals(expected, resourceResponse("/lib/index.html", stash()).get());
     }

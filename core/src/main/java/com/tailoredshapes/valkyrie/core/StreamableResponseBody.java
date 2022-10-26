@@ -1,20 +1,19 @@
 package com.tailoredshapes.valkyrie.core;
 
 import com.tailoredshapes.stash.Stash;
-import com.tailoredshapes.underbar.function.RegularFunctions;
+import com.tailoredshapes.underbar.ocho.function.RegularFunctions;
 
 import java.io.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.Die.*;
-import static com.tailoredshapes.underbar.IO.responseWriter;
-import static com.tailoredshapes.underbar.UnderBar.filter;
-import static com.tailoredshapes.underbar.UnderBar.first;
+import static com.tailoredshapes.underbar.io.IO.responseWriter;
+import static com.tailoredshapes.underbar.ocho.Die.*;
+import static com.tailoredshapes.underbar.ocho.UnderBar.filter;
+import static com.tailoredshapes.underbar.ocho.UnderBar.first;
 import static com.tailoredshapes.valkyrie.util.Response.getCharset;
 
 public abstract class StreamableResponseBody {

@@ -1,7 +1,7 @@
 package com.tailoredshapes.valkyrie.core;
 
 import com.tailoredshapes.stash.Stash;
-import com.tailoredshapes.underbar.function.RegularFunctions;
+import com.tailoredshapes.underbar.ocho.function.RegularFunctions;
 
 import java.util.function.Function;
 

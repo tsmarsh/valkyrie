@@ -6,11 +6,10 @@ import com.tailoredshapes.valkyrie.core.Handler;
 import org.junit.Test;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.Die.die;
-import static com.tailoredshapes.underbar.Die.rethrow;
+import static com.tailoredshapes.underbar.ocho.Die.die;
 import static com.tailoredshapes.valkyrie.middleware.ContentType.contentTypeResponse;
 import static com.tailoredshapes.valkyrie.middleware.ContentType.wrapContentType;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class ContentTypeTest {

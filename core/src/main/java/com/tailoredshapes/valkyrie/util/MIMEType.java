@@ -6,10 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import static com.tailoredshapes.underbar.UnderBar.*;
-import static com.tailoredshapes.underbar.UnderReg.groups;
-import static com.tailoredshapes.underbar.UnderReg.matcher;
-import static com.tailoredshapes.underbar.UnderReg.pattern;
+import static com.tailoredshapes.underbar.ocho.UnderBar.*;
+import static com.tailoredshapes.underbar.ocho.UnderReg.pattern;
 
 /**
  * Created by tmarsh on 2/9/17.

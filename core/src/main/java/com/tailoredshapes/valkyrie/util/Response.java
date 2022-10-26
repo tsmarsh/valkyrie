@@ -1,8 +1,8 @@
 package com.tailoredshapes.valkyrie.util;
 
 import com.tailoredshapes.stash.Stash;
-import com.tailoredshapes.underbar.UnderBar;
-import com.tailoredshapes.underbar.UnderString;
+import com.tailoredshapes.underbar.ocho.UnderBar;
+import com.tailoredshapes.underbar.ocho.UnderString;
 
 import java.io.File;
 import java.net.JarURLConnection;
@@ -17,10 +17,9 @@ import java.util.regex.Matcher;
 import java.util.zip.ZipEntry;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.Die.rethrow;
-import static com.tailoredshapes.underbar.IO.lastModifiedDate;
-import static com.tailoredshapes.underbar.IO.resource;
-import static com.tailoredshapes.underbar.UnderBar.*;
+import static com.tailoredshapes.underbar.ocho.Die.rethrow;
+import static com.tailoredshapes.underbar.io.IO.lastModifiedDate;
+import static com.tailoredshapes.underbar.ocho.UnderBar.*;
 import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
 import static com.tailoredshapes.valkyrie.util.Time.formatDate;
 import static com.tailoredshapes.valkyrie.util.methods.ResourceData.resourceData;

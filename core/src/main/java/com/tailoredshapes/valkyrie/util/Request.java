@@ -6,13 +6,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.IO.slurp;
-import static com.tailoredshapes.underbar.UnderBar.*;
-import static com.tailoredshapes.underbar.UnderReg.*;
-import static com.tailoredshapes.underbar.UnderString.join;
+import static com.tailoredshapes.underbar.io.IO.slurp;
+import static com.tailoredshapes.underbar.ocho.UnderBar.*;
+import static com.tailoredshapes.underbar.ocho.UnderReg.*;
+import static com.tailoredshapes.underbar.ocho.UnderString.join;
 import static com.tailoredshapes.valkyrie.util.Parsing.reCharset;
 
 /**

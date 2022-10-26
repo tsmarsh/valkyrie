@@ -6,7 +6,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tailoredshapes.underbar.Die.rethrow;
+import static com.tailoredshapes.underbar.ocho.Die.rethrow;
 
 /**
  * Created by tmarsh on 2/15/17.

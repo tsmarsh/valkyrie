@@ -4,7 +4,6 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -20,8 +19,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.IO.file;
-import static com.tailoredshapes.underbar.IO.resource;
+import static com.tailoredshapes.underbar.io.IO.file;
 import static com.tailoredshapes.valkyrie.adapters.Jetty.runJetty;
 import static org.junit.Assert.assertEquals;
 
@@ -64,7 +62,7 @@ public class JettyTest {
                         "port", 6699,
                         "ssl?", true,
                         "ssl-port", 5533,
-                        "keystore", file(resource("/keystore")).getAbsolutePath(),
+                        "keystore", file(this.getClass().getResource("/keystore")).getAbsolutePath(),
                         "key-password", "p@ssW0rd!",
                         "host", "localhost"));
 
@@ -183,7 +181,7 @@ public class JettyTest {
         server.start();
 
         SSLContext sc = SSLContexts.custom()
-                .loadTrustMaterial(file(resource("/client_keystore.jks")), "p@ssW0rd".toCharArray(),
+                .loadTrustMaterial(file(this.getClass().getResource("/client_keystore.jks")), "p@ssW0rd".toCharArray(),
                         new TrustSelfSignedStrategy())
                 .build();
 
@@ -230,7 +228,7 @@ public class JettyTest {
 //        server.start();
 //
 //        SSLContext sc = SSLContexts.custom()
-//                .loadTrustMaterial(file(resource("/client_keystore.jks")), "p@ssW0rd".toCharArray(),
+//                .loadTrustMaterial(file(this.getClass().getResource("/client_keystore.jks")), "p@ssW0rd".toCharArray(),
 //                        new TrustSelfSignedStrategy())
 //                .build();
 //

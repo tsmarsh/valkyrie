@@ -1,22 +1,22 @@
 package com.tailoredshapes.valkyrie.adapters;
 
 import com.tailoredshapes.stash.Stash;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static com.tailoredshapes.underbar.Die.die;
-import static com.tailoredshapes.underbar.Die.rethrow;
+import static com.tailoredshapes.underbar.ocho.Die.die;
+import static com.tailoredshapes.underbar.ocho.Die.rethrow;
 import static com.tailoredshapes.valkyrie.servlet.Servlet.buildRequestMap;
 import static com.tailoredshapes.valkyrie.servlet.Servlet.updateServletResponse;
 
@@ -56,8 +56,8 @@ public class Jetty {
         return serverConnector;
     }
 
-    private static SslContextFactory sslContextFactory(Stash options) {
-        SslContextFactory context = new SslContextFactory();
+    private static SslContextFactory.Server sslContextFactory(Stash options) {
+        SslContextFactory.Server context = new SslContextFactory.Server();
         Object keystore = options.get("keystore");
         if (keystore instanceof String) {
             context.setKeyStorePath((String) keystore);
@@ -181,7 +181,7 @@ public class Jetty {
 
             }
         } catch (Exception e) {
-            rethrow(server::stop);
+            rethrow(() -> server.stop());
             die(e, e.getMessage());
         }
         return server;

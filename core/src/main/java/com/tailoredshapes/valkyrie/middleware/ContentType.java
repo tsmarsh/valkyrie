@@ -5,7 +5,7 @@ import com.tailoredshapes.valkyrie.core.AsyncHandler;
 import com.tailoredshapes.valkyrie.core.Handler;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.UnderBar.hash;
+import static com.tailoredshapes.underbar.ocho.UnderBar.hash;
 import static com.tailoredshapes.valkyrie.util.MIMEType.extMimeType;
 import static com.tailoredshapes.valkyrie.util.Response.contentType;
 import static com.tailoredshapes.valkyrie.util.Response.getHeader;

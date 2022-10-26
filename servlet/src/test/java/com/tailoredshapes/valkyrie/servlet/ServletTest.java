@@ -1,6 +1,7 @@
 package com.tailoredshapes.valkyrie.servlet;
 
 import com.tailoredshapes.stash.Stash;
+import jakarta.servlet.http.HttpServlet;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -13,13 +14,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServlet;
-
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.IO.file;
-import static com.tailoredshapes.underbar.IO.resource;
-import static com.tailoredshapes.underbar.UnderBar.array;
-import static com.tailoredshapes.underbar.UnderBar.list;
+import static com.tailoredshapes.underbar.io.IO.file;
+import static com.tailoredshapes.underbar.ocho.UnderBar.array;
+import static com.tailoredshapes.underbar.ocho.UnderBar.list;
 import static com.tailoredshapes.valkyrie.servlet.Servlet.servlet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,7 +35,7 @@ public class ServletTest {
     private Stash fileResponse = stash(
             "status", 200,
             "headers", stash("Content-Type", "text/plain", "Cookie", list("foo=5", "moo=cow")),
-            "body", file(resource("/hello.txt")));
+            "body", file(this.getClass().getResource("/hello.txt")));
 
     private Stash streamResponse = stash(
             "status", 200,
@@ -111,9 +109,11 @@ public class ServletTest {
 
         server.start();
 
-        CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet get = new HttpGet("http://localhost:6666");
-        CloseableHttpResponse response = client.execute(get);
+        CloseableHttpResponse response;
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            HttpGet get = new HttpGet("http://localhost:6666");
+            response = client.execute(get);
+        }
         assertEquals(500, response.getStatusLine().getStatusCode());
 
         server.stop();

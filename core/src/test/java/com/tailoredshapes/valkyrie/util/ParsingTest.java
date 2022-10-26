@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import java.util.regex.Matcher;
 
-import static com.tailoredshapes.underbar.UnderBar.first;
-import static com.tailoredshapes.underbar.UnderReg.groups;
-import static com.tailoredshapes.underbar.UnderReg.matcher;
+import static com.tailoredshapes.underbar.ocho.UnderBar.first;
+import static com.tailoredshapes.underbar.ocho.UnderReg.groups;
+import static com.tailoredshapes.underbar.ocho.UnderReg.matcher;
 import static com.tailoredshapes.valkyrie.util.Parsing.*;
 import static org.junit.Assert.*;
 

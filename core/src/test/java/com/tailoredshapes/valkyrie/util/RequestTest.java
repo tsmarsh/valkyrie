@@ -4,8 +4,9 @@ import com.tailoredshapes.stash.Stash;
 import org.junit.Test;
 
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.IO.*;
-import static com.tailoredshapes.underbar.UnderBar.optional;
+import static com.tailoredshapes.underbar.io.IO.file;
+import static com.tailoredshapes.underbar.io.IO.stringInputStream;
+import static com.tailoredshapes.underbar.ocho.UnderBar.optional;
 import static com.tailoredshapes.valkyrie.util.Request.*;
 import static org.junit.Assert.*;
 
@@ -49,7 +50,7 @@ public class RequestTest {
     public void canExtractStringFromBody() throws Exception {
         assertEquals(optional(), bodyString(stash("body", null)));
         assertEquals(optional("Hello, World!"), bodyString(stash("body", "Hello, World!")));
-        assertEquals(optional("Hello, World!"), bodyString(stash("body", file(resource("/test.txt")))));
+        assertEquals(optional("Hello, World!"), bodyString(stash("body", file(this.getClass().getResource("/test.txt")))));
         assertEquals(optional("Hello, World!"), bodyString(stash("body", stringInputStream("Hello, World!"))));
     }
 

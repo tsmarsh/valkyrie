@@ -1,15 +1,13 @@
 package com.tailoredshapes.valkyrie.middleware;
 
 import com.tailoredshapes.stash.Stash;
-import com.tailoredshapes.underbar.Dates;
+import com.tailoredshapes.underbar.dates.Dates;
 import com.tailoredshapes.valkyrie.core.AsyncHandler;
 import com.tailoredshapes.valkyrie.core.Handler;
 import org.junit.Test;
 
-import java.util.Date;
-
 import static com.tailoredshapes.stash.Stash.stash;
-import static com.tailoredshapes.underbar.Die.die;
+import static com.tailoredshapes.underbar.ocho.Die.die;
 import static com.tailoredshapes.valkyrie.middleware.Cookies.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
