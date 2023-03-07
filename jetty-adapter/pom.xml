@@ -16,7 +16,7 @@
         <dependency>
             <groupId>com.tailoredshapes</groupId>
             <artifactId>stash</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tailoredshapes.valkyrie</groupId>

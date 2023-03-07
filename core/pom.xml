@@ -54,17 +54,17 @@
         <dependency>
             <groupId>com.tailoredshapes</groupId>
             <artifactId>underbar.ocho</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.2</version>
         </dependency>
         <dependency>
             <groupId>com.tailoredshapes</groupId>
             <artifactId>stash</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.tailoredshapes</groupId>
             <artifactId>underbar.io</artifactId>
-            <version>0.2.0</version>
+            <version>0.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
